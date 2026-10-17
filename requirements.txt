@@ -1,0 +1,31 @@
+# --- Mô hình & NLP ---
+transformers>=4.40
+tokenizers
+sentencepiece          # tokenizer cho XLM-R / ViSoBERT
+accelerate             # tuỳ chọn, hỗ trợ train/AMP
+peft                   # tuỳ chọn, nếu lưu adapter thay vì checkpoint đầy đủ
+py_vncorenlp           # tách từ cho PhoBERT (cần Java)
+
+# --- Dữ liệu & baseline ---
+numpy
+pandas
+scikit-learn           # TF-IDF, LogisticRegression, LinearSVC, metric
+scipy
+joblib
+pyyaml
+emoji                  # xử lý emoji khi tiền xử lý / test biên
+
+# --- Đo chi phí & tiện ích ---
+tqdm
+psutil                 # đo RAM
+nvidia-ml-py           # đo VRAM (tuỳ chọn, chỉ có ý nghĩa khi có GPU NVIDIA)
+
+# --- EDA, phân tích lỗi ---
+matplotlib
+seaborn
+jupyter
+ipykernel
+
+# --- Demo & test ---
+gradio                 # hoặc thay bằng streamlit
+pytest

@@ -1,0 +1,19 @@
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# dữ liệu (không phân phối lại nếu điều khoản hạn chế)
+data/raw/*
+data/processed/*
+vncorenlp/
+
+# kết quả nặng
+outputs/checkpoints/*
+*.pt
+*.bin
+*.safetensors
+
+# giữ thư mục rỗng
+!.gitkeep
+EOF
