@@ -11,12 +11,11 @@ def _prf(tp: int, fp: int, fn: int) -> tuple[float, float, float]:
     f = (2 * p * r / (p + r)) if (p + r) > 0 else 0.0
     return p, r, f
 
-
 def evaluate(
-    gold_rows: List[Dict[str, Any]],
-    presence_pred: Union[List[List[int]], np.ndarray],
-    sent_pred: Union[List[List[int]], np.ndarray],
-) -> Dict[str, Any]:
+    gold_rows: list[dict[str, Any]],
+    presence_pred: list[list[int]] | np.ndarray,
+    sent_pred: list[list[int]] | np.ndarray,
+) -> dict[str, Any]:
     """Tính toán toàn bộ metric đánh giá ABSA theo tiêu chuẩn Mục 13.
     
     Args:
