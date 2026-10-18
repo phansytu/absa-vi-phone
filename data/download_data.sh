@@ -14,5 +14,5 @@ fi
 
 (cd "$RAW" && sha256sum Train.csv Dev.csv Test.csv | tee SHA256SUMS.txt)
 
-python -m src.data.dataset "$RAW" data/processed
+python -m src.data.dataset "$RAW" data/load
 echo "Xong. Kiểm tra data/raw/SHA256SUMS.txt và ghi nhật ký khảo sát"   
