@@ -39,8 +39,10 @@ def main(raw_dir="data/raw", out_dir="data/processed"):
     # Xác định thư mục gốc hiện tại của dự án làm vùng an toàn
     base_project_dir = Path(".").resolve()
     
-    raw_path = Path(raw_dir)
-    out_path = Path(out_dir)
+    raw_path = Path(raw_dir).resolve()
+    out_path = Path(out_dir).resolve()
+    
+    base_project_dir = Path(".").resolve()
     
     # KIỂM TRA BẢO MẬT: Ngăn chặn triệt để Path Traversal
     if not is_safe_path(base_project_dir, raw_path) or not is_safe_path(base_project_dir, out_path):
