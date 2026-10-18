@@ -45,7 +45,7 @@ def cv(texts, tp=FIX, ngram=(1, 2), C=4.0, min_df=2, k=5, ret_oof=False):
         sent = np.zeros((len(te), 10), dtype=int)
 
         for a in range(10):
-            # 1. Presence Model (có fallback an toàn)
+            # Presence Model (có fallback an toàn)
             y_p = P[tr, a]
             u_p = np.unique(y_p)
             if len(u_p) < 2:
@@ -54,10 +54,10 @@ def cv(texts, tp=FIX, ngram=(1, 2), C=4.0, min_df=2, k=5, ret_oof=False):
                 cp = LogisticRegression(
                     C=C, class_weight="balanced", max_iter=1000, random_state=42
                 ).fit(Xtr, y_p)
-                idx_1 = np.where(cp.classes_ == 1)[0][0]
+                idx_1 = np.nonzero(cp.classes_ == 1)[0][0]
                 prob[:, a] = cp.predict_proba(Xte)[:, idx_1]
 
-            # 2. Sentiment Model (chỉ huấn luyện trên mẫu xuất hiện khía cạnh)
+            # Sentiment Model (chỉ huấn luyện trên mẫu xuất hiện khía cạnh)
             m = S[tr, a] != IGNORE_INDEX
             y_s = S[tr, a][m]
             u_s = np.unique(y_s)
