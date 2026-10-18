@@ -1,4 +1,5 @@
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -11,13 +12,17 @@ from .models.baseline import TfidfBaseline
 
 
 def main(raw_dir: str = "data/raw", out_dir: str = "outputs"):
-    raw_path, out_path = Path(raw_dir), Path(out_dir)
+    base_dir = Path(os.getcwd()).resolve()
+    raw_path = Path(raw_dir).resolve()
+    out_path = Path(out_dir).resolve()
+    
+    if not (raw_path.is_relative_to(base_dir) and out_path.is_relative_to(base_dir)):
+        raise ValueError("Security Error: Path traversal attempt detected!")
     
     # 1. Load dữ liệu và Huấn luyện Baseline
     train, dev = load_split(raw_path, "train"), load_split(raw_path, "dev")
     model = TfidfBaseline().fit(train)
     prob, sent = model.predict(dev)
-
     # 2. Tìm ngưỡng tối ưu toàn cục (Global Threshold) trên tập Dev theo Joint F1
     grid = np.arange(0.2, 0.81, 0.05)
     scores = [
