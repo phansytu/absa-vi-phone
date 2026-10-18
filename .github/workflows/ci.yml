@@ -25,8 +25,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-           pip install --only-binary :all: --no-binary py_vncorenlp -r requirements.txt ruff==0.6.9
+          python -m pip install --upgrade pip --only-binary :all:
+          pip install --only-binary :all: --no-binary py_vncorenlp -r requirements.txt ruff==0.6.9
 
       - name: Lint with Ruff
         run: ruff check src tests
