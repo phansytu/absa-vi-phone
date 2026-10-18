@@ -27,7 +27,7 @@ def evaluate(
     gs = np.array([r["sentiment"] for r in gold_rows])
     pp, ps = np.asarray(presence_pred), np.asarray(sent_pred)
 
-    out: Dict[str, Any] = {"n_samples": len(gold_rows)}
+    out: dict[str, Any] = {"n_samples": len(gold_rows)}
 
     # 1. Aspect Detection Metrics
     out["aspect_micro_f1"] = float(f1_score(gp, pp, average="micro", zero_division=0))
