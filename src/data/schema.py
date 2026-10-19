@@ -34,7 +34,7 @@ def to_vectors(pairs: Dict[str, str]) -> Tuple[List[int], List[int]]:
         sentiment[ASPECT2ID[a]] = POL2ID[p]
     return presence, sentiment
 
-def from_vector(presence: List[int], sentiment: List[int]) -> List[Dict[str, str]]:
+def from_vectors(presence: List[int], sentiment: List[int]) -> List[Dict[str, str]]:
     """Chuyển ngược vector về dạng [{aspect, sentiment}] chỉ cho khía cạnh có mặt."""
     results = []
     

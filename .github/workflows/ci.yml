@@ -1,16 +1,42 @@
 name: ci
 
-on: 
+on:
   push:
   pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   test:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: "3.11" }
-      - run: pip install --only-binary :all: -r requirements.txt ruff==0.6.9
-      - run: ruff check src tests
-      - run: pytest -q --pass-empty-failures
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: '11'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: requirements-prod.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install \
+            --only-binary=:all: \
+            --no-binary=py_vncorenlp \
+            -r requirements-prod.txt
+
+      - name: Lint with Ruff
+        run: python -m ruff check src tests
+
+      - name: Run tests with Pytest
+        run: python -m pytest -q

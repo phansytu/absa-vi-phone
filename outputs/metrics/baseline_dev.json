@@ -1,0 +1,39 @@
+{
+  "n_samples": 1112,
+  "aspect_micro_f1": 0.8671686746987952,
+  "aspect_macro_f1": 0.8215154649870527,
+  "aspect_f1_per_aspect": {
+    "SCREEN": 0.78125,
+    "CAMERA": 0.919732441471572,
+    "FEATURES": 0.862533692722372,
+    "BATTERY": 0.9672943508424182,
+    "PERFORMANCE": 0.8654670094258783,
+    "STORAGE": 0.5,
+    "DESIGN": 0.7957559681697612,
+    "PRICE": 0.8845401174168297,
+    "GENERAL": 0.8371104815864022,
+    "SER&ACC": 0.8014705882352942
+  },
+  "n_gold_present_pairs": 3316,
+  "sentiment_macro_f1_given_gold_aspect": 0.777105223030695,
+  "joint_precision": 0.7509025270758123,
+  "joint_recall": 0.752714113389626,
+  "joint_f1": 0.7518072289156628,
+  "joint_f1_per_aspect": {
+    "SCREEN": 0.640625,
+    "CAMERA": 0.7491638795986622,
+    "FEATURES": 0.7331536388140161,
+    "BATTERY": 0.8245787908820613,
+    "PERFORMANCE": 0.7369323050556984,
+    "STORAGE": 0.5,
+    "DESIGN": 0.6949602122015915,
+    "PRICE": 0.7123287671232876,
+    "GENERAL": 0.7861189801699717,
+    "SER&ACC": 0.7279411764705882
+  },
+  "n_gold_empty": 18,
+  "gold_empty_predicted_empty_rate": 0.2222222222222222,
+  "threshold": 0.44999999999999996,
+  "split": "dev",
+  "model": "tfidf_baseline"
+}
