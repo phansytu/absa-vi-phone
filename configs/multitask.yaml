@@ -1,0 +1,9 @@
+encoder: uitnlp/visobert
+max_length: 128         
+pooling: mean            
+batch_size: 32
+epochs: 6
+lr_encoder: 2.0e-5
+lr_head: 5.0e-4
+lambda: 1.0
+norm: {tone: true, teencode: true, repeat: true}

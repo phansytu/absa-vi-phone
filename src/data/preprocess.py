@@ -22,6 +22,9 @@ _TEEN = {
     "với": ["vs"], "wifi": ["wf"], "cũng": ["cx"], "ok": ["oke", "oki", "okê", "okie", "okay"],
     "pin": ["bin"], "gì": ["j"], "rồi": ["r"], "bình thường": ["bt", "bth"],
     "sử dụng": ["sd"], "trước": ["trc"], "luôn": ["lun"], "nhưng": ["nhưg"],
+    # thêm trường hợp xử lý 
+    "sao" : ["s"], "thấy" : ["thasy", "thsay"]
+    
 }
 _TEEN_MAP = {v: k for k, vs in _TEEN.items() for v in vs}
 _TEEN_RE = re.compile(
