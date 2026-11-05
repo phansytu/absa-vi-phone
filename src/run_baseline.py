@@ -9,59 +9,55 @@ from .data.load import load_split
 from .data.schema import ASPECTS, from_vectors
 from .evaluate import evaluate
 from .models.baseline import TfidfBaseline
+from .tune_threshold import apply_threshold, tune_per_aspect_threshold_floor, format_threshold_table
 
 
 def main(raw_dir: str = "data/raw", out_dir: str = "outputs"):
     base_dir = Path(os.getcwd()).resolve()
     raw_path = Path(raw_dir).resolve()
     out_path = Path(out_dir).resolve()
-    
+
     if not (raw_path.is_relative_to(base_dir) and out_path.is_relative_to(base_dir)):
         raise ValueError("Security Error: Path traversal attempt detected!")
-    
+
     # 1. Load dữ liệu và Huấn luyện Baseline
     train, dev = load_split(raw_path, "train"), load_split(raw_path, "dev")
     model = TfidfBaseline().fit(train)
     prob, sent = model.predict(dev)
-    # 2. Tìm ngưỡng tối ưu toàn cục (Global Threshold) trên tập Dev theo Joint F1
-    grid = np.arange(0.2, 0.81, 0.05)
-    scores = [
-        evaluate(dev, (prob >= t).astype(int), sent)["joint_f1"] 
-        for t in grid
-    ]
-    best_idx = int(np.argmax(scores))
-    thr = float(grid[best_idx])
-    
-    # 3. Tạo nhãn dự đoán theo ngưỡng tối ưu và Tính toán Metric
-    pres = (prob >= thr).astype(int)
-    res = evaluate(dev, pres, sent)
-    res.update(threshold=thr, split="dev", model="tfidf_baseline")
+    gold_p = np.array([r["presence"] for r in dev])
 
-    # 4. Lưu Kết quả Metric và Dự đoán
+    # 2. NGƯỠNG V2C (FLOOR THRESHOLD) - MỐC CHÍNH THỨC
+    thr_v2c = tune_per_aspect_threshold_floor(prob, gold_p)
+    pres_v2c = apply_threshold(prob, thr_v2c)
+    res_v2c = evaluate(dev, pres_v2c, sent)
+
+    print("\n=== V2C FLOOR THRESHOLD (BASELINE CHÍNH THỨC) ===")
+    print(format_threshold_table(thr_v2c))
+    print(f"  joint_f1      = {res_v2c['joint_f1']:.4f}")
+    print(f"  aspect_micro  = {res_v2c['aspect_micro_f1']:.4f}")
+    print(f"  aspect_macro  = {res_v2c['aspect_macro_f1']:.4f}")
+    print(f"  empty_acc     = {res_v2c['gold_empty_predicted_empty_rate']:.4f}")
+
+    # 3. Lưu kết quả V2C
     metrics_dir = out_path / "metrics"
     preds_dir = out_path / "predictions"
     metrics_dir.mkdir(parents=True, exist_ok=True)
     preds_dir.mkdir(parents=True, exist_ok=True)
 
-    # Ghi file metrics JSON an toàn với context manager
-    with open(metrics_dir / "baseline_dev.json", "w", encoding="utf-8") as f:
-        json.dump(res, f, indent=2, ensure_ascii=False)
+    with open(metrics_dir / "baseline_dev_v2c.json", "w", encoding="utf-8") as f:
+        json.dump({**res_v2c, "thresholds": thr_v2c.tolist(), "mode": "v2c"}, f, indent=2, ensure_ascii=False)
 
-    # Ghi file predictions JSONL
-    with open(preds_dir / "baseline_dev.jsonl", "w", encoding="utf-8") as f:
-        for r, p, s, pr in zip(dev, pres, sent, prob):
+    with open(preds_dir / "baseline_dev_v2c.jsonl", "w", encoding="utf-8") as f:
+        for r, p, s, pr in zip(dev, pres_v2c, sent, prob):
             rec = {
-                "id": r["id"],
-                "text": r["text"],
+                "id": r["id"], "text": r["text"],
                 "pred": from_vectors(p.tolist(), s.tolist()),
                 "prob": {a: round(float(x), 4) for a, x in zip(ASPECTS, pr)},
             }
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
 
-    # 5. In tóm tắt chỉ số chính ra màn hình
-    summary = {k: v for k, v in res.items() if not isinstance(v, dict)}
-    print("\n=== BASELINE DEV EVALUATION SUMMARY ===")
-    print(json.dumps(summary, indent=2, ensure_ascii=False))
+    print(f"\nĐã lưu: outputs/metrics/baseline_dev_v2c.json")
+    print(f"Đã lưu: outputs/predictions/baseline_dev_v2c.jsonl")
 
 
 if __name__ == "__main__":
