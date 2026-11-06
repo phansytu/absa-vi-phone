@@ -5,20 +5,16 @@ from src.data.preprocess import normalize
 
 
 class ABSADataset(Dataset):
-    def __init__(self, path, norm_kwargs=None, segmenter=None):
+    def __init__(self, path, norm_kwargs=None, segmenter=None, use_segmented=True):
         with open(path, encoding="utf-8") as f:
             self.rows = [json.loads(line) for line in f]
-        self.norm_kwargs = norm_kwargs or {}
-        self.segmenter = segmenter        
-
-    def __len__(self):
-        return len(self.rows)
+        self.use_segmented = use_segmented
 
     def __getitem__(self, i):
         r = self.rows[i]
-        text = normalize(r["text"], **self.norm_kwargs)
-        if self.segmenter:
-            text = self.segmenter(text)
+        # Ưu tiên text đã tách từ
+        text = r.get("text_segmented") if self.use_segmented else r["text"]
+        text = text or r["text"]
         return {"id": r["id"], "text": text,
                 "presence": r["presence"], "sentiment": r["sentiment"]}
 

@@ -7,3 +7,5 @@ lr_encoder: 2.0e-5
 lr_head: 5.0e-4
 lambda: 1.0
 norm: {tone: true, teencode: true, repeat: true}
+data_dir: "data/processed_segmented"
+encoder: "vinai/phobert-base"
