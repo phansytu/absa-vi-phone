@@ -53,8 +53,9 @@ def main(cfg_path, seed, sets=(), limit=None, overfit=None, tag=""):
 
     tok = AutoTokenizer.from_pretrained(cfg["encoder"])
     collate = make_collate(tok, cfg["max_length"])
-    tr = ABSADataset("data/processed/train.jsonl", cfg["norm"])
-    dv = ABSADataset("data/processed/dev.jsonl", cfg["norm"])
+    data_dir = cfg.get("data_dir", "data/processed")
+    tr = ABSADataset(f"{data_dir}/train.jsonl", cfg["norm"], use_segmented=True)
+    dv = ABSADataset(f"{data_dir}/dev.jsonl", cfg["norm"], use_segmented=True)
     if limit:                                   # smoke test
         tr.rows = tr.rows[:limit]
         dv.rows = dv.rows[:max(200, limit // 4)]
