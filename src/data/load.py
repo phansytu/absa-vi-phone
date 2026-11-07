@@ -20,8 +20,9 @@ def is_safe_path(base_dir: Path, target_dir: Path) -> bool:
         return False
 
 
-def load_split(raw_dir: Path, split: str) -> list:
+def load_split(raw_dir: Path | str, split: str) -> list:
     # Đảm bảo raw_dir truyền vào đã là đối tượng Path an toàn
+    raw_dir = Path(raw_dir)
     df = pd.read_csv(raw_dir / SPLITS[split], encoding="utf-8")
     rows = []
     for r in df.itertuples(index=False):
