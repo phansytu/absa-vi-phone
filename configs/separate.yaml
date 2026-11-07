@@ -1,0 +1,17 @@
+# Cấu hình cho kiến trúc Separate Models (mô hình riêng biệt cho từng khía cạnh)
+encoder: uitnlp/visobert
+max_length: 128
+pooling: mean
+batch_size: 32
+epochs: 6
+lr_encoder: 2.0e-5
+lr_head: 5.0e-4
+dropout: 0.1
+# Huấn luyện 10 bộ phân loại độc lập cho 10 khía cạnh
+n_aspects: 10
+n_polarities: 3
+seed: 42
+norm:
+  tone: true
+  teencode: true
+  repeat: true
