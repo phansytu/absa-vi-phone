@@ -22,8 +22,6 @@ class ABSADataset(Dataset):
             text = r["text_segmented"]
         else:
             text = r["text"]
-            if self.segmenter:
-                text = self.segmenter(text)
         # Normalize SAU tách từ (lowercase, teencode, dấu thanh)
         if self.norm_kwargs:
             text = normalize(text, **self.norm_kwargs)
@@ -44,8 +42,13 @@ def make_collate(tokenizer, max_length=128):
             max_length=max_length,
             return_tensors="pt",
         )
-        enc["presence"] = torch.tensor([b["presence"] for b in batch], dtype=torch.float)
-        enc["sentiment"] = torch.tensor([b["sentiment"] for b in batch], dtype=torch.long)
+        enc["presence"] = torch.tensor(
+            [b["presence"] for b in batch], dtype=torch.float
+        )
+        enc["sentiment"] = torch.tensor(
+            [b["sentiment"] for b in batch], dtype=torch.long
+        )
         enc["ids"] = [b["id"] for b in batch]
         return enc
+
     return collate
