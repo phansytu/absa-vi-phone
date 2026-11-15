@@ -6,7 +6,6 @@ Nhận văn bản thô -> Tiền xử lý -> Mô hình (MultiTask ViSoBERT hoặ
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
@@ -15,7 +14,7 @@ import torch
 from transformers import AutoTokenizer
 
 from src.data.preprocess import normalize
-from src.data.schema import ASPECTS, POLARITES, IGNORE_INDEX
+from src.data.schema import ASPECTS, POLARITES
 from src.models.multitask import MultiTaskABSA
 
 

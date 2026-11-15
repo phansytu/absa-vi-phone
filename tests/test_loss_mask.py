@@ -1,7 +1,6 @@
 """Unit test kiểm tra hàm loss mask của mô hình MultiTask (Mục 6.2)."""
 
 import torch
-import pytest
 from src.data.schema import IGNORE_INDEX
 from src.models.multitask import multitask_loss
 
