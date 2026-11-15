@@ -212,7 +212,7 @@ Chạy thử cho kết quả hợp lý (ví dụ câu đầu ra `SCREEN→Negati
 
 #### Hợp đồng giao diện cho mô hình mới (rất quan trọng cho TV3, TV4)
 
-Mọi mô hình mới (multitask, separate, aspect-conditioned) nên có hàm `predict(rows)` trả về cùng dạng: **`(presence_prob [N,10], sent_pred [N,10])`**. Khi đó `evaluate.py` và `run_baseline.py`-style script dùng lại được, và các mô hình được so sánh **cùng một cách tính**.
+Mọi mô hình mới (multitask) nên có hàm `predict(rows)` trả về cùng dạng: **`(presence_prob [N,10], sent_pred [N,10])`**. Khi đó `evaluate.py` và `run_baseline.py`-style script dùng lại được, và các mô hình được so sánh **cùng một cách tính**.
 
 ### 4.4. File đánh giá và chạy
 
@@ -376,8 +376,7 @@ Aspect micro-F1 (chỉ xét có mặt hay không): phát hiện đúng BATTERY v
 | File dự kiến                                                                       | Nội dung                                                                    | Phụ trách (theo phân công 5 người) |
 | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- | ---------------------------------------- |
 | `src/data/dataset.py`                                                              | Dataset PyTorch, tokenize, collate, nhãn −100                              | TV1                                      |
-| `src/models/multitask.py`, `src/train.py`, `configs/multitask.yaml`            | Encoder đa nhiệm, huấn luyện, 3 seed                                     | TV3                                      |
-| `src/models/separate.py`, `src/models/conditioned.py`                            | Đối chứng và mở rộng aspect-conditioned                                | TV4                                      |
+| `src/models/multitask.py`, `src/train.py`, `configs/multitask.yaml`            | Encoder đa nhiệm, huấn luyện, 3 seed                                     | TV3, TV4                                 |
 | `tests/test_schema.py`, `tests/test_evaluate.py`                                 | Test schema và metric bằng ví dụ tính tay (mục 6.4 dùng được ngay) | TV1, TV2                                 |
 | `src/pipeline.py`, `tests/test_pipeline.py`, `demo/app.py`                     | Text → `[{aspect, sentiment}]`, test trường hợp biên, demo Gradio     | TV5                                      |
 | `notebooks/01_eda.ipynb`, `02_baseline_check.ipynb`, `03_error_analysis.ipynb` | Khảo sát dữ liệu, kiểm tra tay, phân tích lỗi                        | TV1, TV2, TV5                            |

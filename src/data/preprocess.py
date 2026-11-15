@@ -16,14 +16,14 @@ _TONE_RE = re.compile(r"(?<!q)(" + "|".join(map(re.escape, _TONE)) + r")(?!\w)")
 
 # Teencode/viết tắt thông dụng
 _TEEN = {
-    "không": ["ko", "kg", "hok", "hk", "hong", "hông", "khong", "khôg", "khg"],
+    "không": ["ko", "kg", "hok", "hk", "hong", "hông", "khong", "khôg", "khg", "k"],
     "được": ["dc", "đc"], "điện thoại": ["dt", "đt"], "sản phẩm": ["sp"],
     "nhân viên": ["nv"], "mọi người": ["mn"], "mình": ["mk", "mik", "mih"],
     "với": ["vs"], "wifi": ["wf"], "cũng": ["cx"], "ok": ["oke", "oki", "okê", "okie", "okay"],
     "pin": ["bin"], "gì": ["j"], "rồi": ["r"], "bình thường": ["bt", "bth"],
     "sử dụng": ["sd"], "trước": ["trc"], "luôn": ["lun"], "nhưng": ["nhưg"],
     # thêm trường hợp xử lý 
-    "sao" : ["s"], "thấy" : ["thasy", "thsay"]
+    "sao" : ["s"], "thấy" : ["thasy", "thsay"],"vậy":["v","z"]
     
 }
 _TEEN_MAP = {v: k for k, vs in _TEEN.items() for v in vs}

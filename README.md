@@ -185,9 +185,7 @@ Mở trình duyệt tại **`http://127.0.0.1:7860`** để sử dụng giao di�
 absa-vi-phone/
 ├── configs/                      # Cấu hình siêu tham số thí nghiệm (YAML)
 │   ├── baseline.yaml             # Cấu hình TF-IDF Baseline
-│   ├── multitask.yaml            # Cấu hình Multi-task ViSoBERT
-│   ├── separate.yaml             # Cấu hình Separate Models
-│   └── aspect_conditioned.yaml   # Cấu hình Aspect-Conditioned Model
+│   └── multitask.yaml            # Cấu hình Multi-task ViSoBERT
 ├── data/
 │   ├── download_data.sh          # Script tải dữ liệu UIT-ViSFD từ tác giả
 │   ├── raw/                      # Dữ liệu gốc: Train.csv, Dev.csv, Test.csv (Không commit)

@@ -15,16 +15,16 @@
   }
  },
  "dev": {
-  "n_samples": 200.0,
-  "aspect_micro_f1": 0.5095017976373909,
-  "aspect_macro_f1": 0.4260493889515441,
-  "n_gold_present_pairs": 558.0,
-  "sentiment_macro_f1_given_gold_aspect": 0.4909210015285295,
-  "joint_precision": 0.22750179985601152,
-  "joint_recall": 0.5663082437275986,
-  "joint_f1": 0.3246019517205958,
-  "n_gold_empty": 4.0,
-  "gold_empty_predicted_empty_rate": 0.0
+  "n_samples": 1112.0,
+  "aspect_micro_f1": 0.8439024390243902,
+  "aspect_macro_f1": 0.7545890451689807,
+  "n_gold_present_pairs": 3316.0,
+  "sentiment_macro_f1_given_gold_aspect": 0.7552664587746104,
+  "joint_precision": 0.7318125770653514,
+  "joint_recall": 0.7159227985524729,
+  "joint_f1": 0.723780487804878,
+  "n_gold_empty": 18.0,
+  "gold_empty_predicted_empty_rate": 0.2222222222222222
  },
- "epoch": 5
+ "epoch": 1
 }
