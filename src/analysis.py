@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import json
 import re
-from collections import Counter, defaultdict
+from collections import defaultdict
 from typing import Any
 
 import numpy as np
@@ -172,10 +172,8 @@ def analyze_contrasting_sentiment(
             continue  # không phải trái chiều
 
         pred_pairs = [(d["aspect"], d["sentiment"]) for d in p.get("pred", [])]
-        pred_pols = {pol for _, pol in pred_pairs}
 
         # Đúng nếu cả 2 polarity đều được dự đoán đúng aspect
-        gold_dict = dict(gold_pairs)
         pred_dict = dict(pred_pairs)
         is_correct = all(pred_dict.get(a) == pol for a, pol in gold_pairs)
 
@@ -249,7 +247,6 @@ def threshold_sweep(
     Cần prob_rows dạng [{'prob': {aspect: p, ...}}] (khớp format jsonl).
     """
     from .evaluate import evaluate
-    from .data.schema import from_vectors
 
     grid = grid if grid is not None else np.arange(0.2, 0.81, 0.05)
     gp = _gold_presence(gold_rows)

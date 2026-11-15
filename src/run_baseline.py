@@ -9,7 +9,11 @@ from .data.load import load_split
 from .data.schema import ASPECTS, from_vectors
 from .evaluate import evaluate
 from .models.baseline import TfidfBaseline
-from .tune_threshold import apply_threshold, tune_per_aspect_threshold_floor, format_threshold_table
+from .tune_threshold import (
+    apply_threshold,
+    tune_per_aspect_threshold_floor,
+    format_threshold_table,
+)
 
 
 def main(raw_dir: str = "data/raw", out_dir: str = "outputs"):
@@ -45,19 +49,25 @@ def main(raw_dir: str = "data/raw", out_dir: str = "outputs"):
     preds_dir.mkdir(parents=True, exist_ok=True)
 
     with open(metrics_dir / "baseline_dev_v2c.json", "w", encoding="utf-8") as f:
-        json.dump({**res_v2c, "thresholds": thr_v2c.tolist(), "mode": "v2c"}, f, indent=2, ensure_ascii=False)
+        json.dump(
+            {**res_v2c, "thresholds": thr_v2c.tolist(), "mode": "v2c"},
+            f,
+            indent=2,
+            ensure_ascii=False,
+        )
 
     with open(preds_dir / "baseline_dev_v2c.jsonl", "w", encoding="utf-8") as f:
         for r, p, s, pr in zip(dev, pres_v2c, sent, prob):
             rec = {
-                "id": r["id"], "text": r["text"],
+                "id": r["id"],
+                "text": r["text"],
                 "pred": from_vectors(p.tolist(), s.tolist()),
                 "prob": {a: round(float(x), 4) for a, x in zip(ASPECTS, pr)},
             }
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
 
-    print(f"\nĐã lưu: outputs/metrics/baseline_dev_v2c.json")
-    print(f"Đã lưu: outputs/predictions/baseline_dev_v2c.jsonl")
+    print("\nĐã lưu: outputs/metrics/baseline_dev_v2c.json")
+    print("Đã lưu: outputs/predictions/baseline_dev_v2c.jsonl")
 
 
 if __name__ == "__main__":
