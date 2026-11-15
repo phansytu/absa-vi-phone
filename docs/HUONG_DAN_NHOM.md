@@ -70,6 +70,7 @@ bash data/download_data.sh
 ```
 
 Kết quả mong đợi:
+
 - Thư mục `data/raw/` có `Train.csv`, `Dev.csv`, `Test.csv`, `SHA256SUMS.txt`, `UIT-ViSFD.zip`.
 - Thư mục `data/processed/` có `train.jsonl` (7.786 dòng), `dev.jsonl` (1.112 dòng), `test.jsonl` (2.224 dòng).
 - Terminal in ra ba dòng mã SHA256. Khi chạy thử, ba mã bắt đầu bằng `cd4426cf…` (Train), `ab29bf9e…` (Dev), `a30901f0…` (Test). **Nếu mã của bạn khác**, tác giả có thể đã cập nhật dữ liệu: báo cả nhóm trước khi làm tiếp.
@@ -104,14 +105,14 @@ python -m src.run_baseline data/raw outputs
 
 Kết quả mong đợi khi chạy thử:
 
-| Chỉ số (Dev) | Giá trị |
-|---|---|
-| Aspect micro-F1 | 0,868 |
-| Aspect macro-F1 | 0,822 |
-| Sentiment macro-F1 (biết trước khía cạnh) | 0,777 |
+| Chỉ số (Dev)                                   | Giá trị       |
+| ------------------------------------------------ | --------------- |
+| Aspect micro-F1                                  | 0,868           |
+| Aspect macro-F1                                  | 0,822           |
+| Sentiment macro-F1 (biết trước khía cạnh)   | 0,777           |
 | **Joint aspect–polarity F1 (end-to-end)** | **0,751** |
-| Ngưỡng được chọn trên Dev | 0,45 |
-| Mẫu rỗng được dự đoán đúng là rỗng | 22% (4/18 mẫu) |
+| Ngưỡng được chọn trên Dev                 | 0,45            |
+| Mẫu rỗng được dự đoán đúng là rỗng   | 22% (4/18 mẫu) |
 
 File sinh ra: `outputs/metrics/baseline_dev.json` và `outputs/predictions/baseline_dev.jsonl`.
 
@@ -123,16 +124,16 @@ python experiments/ablation_baseline.py data/raw
 
 Mất khoảng 2–3 phút (5-fold CV, 8 cấu hình, chỉ dùng Train). Kết quả chạy thử (joint F1 trung bình qua 5 fold ± độ lệch giữa fold):
 
-| Cấu hình | Joint F1 |
-|---|---|
-| V0 token mặc định, chỉ NFC/lower | 0,733 ± 0,004 |
-| V1 + sửa token pattern | 0,731 ± 0,006 |
-| V2 + chuẩn dấu thanh | 0,732 ± 0,006 |
-| V3 + teencode, `k` → không | 0,735 ± 0,008 |
-| V4 + đánh dấu phủ định (phạm vi 2) | 0,738 ± 0,005 |
+| Cấu hình                                     | Joint F1                 |
+| ---------------------------------------------- | ------------------------ |
+| V0 token mặc định, chỉ NFC/lower           | 0,733 ± 0,004           |
+| V1 + sửa token pattern                        | 0,731 ± 0,006           |
+| V2 + chuẩn dấu thanh                         | 0,732 ± 0,006           |
+| V3 + teencode, `k` → không                 | 0,735 ± 0,008           |
+| V4 + đánh dấu phủ định (phạm vi 2)      | 0,738 ± 0,005           |
 | V4 + C = 10 (**cấu hình đang dùng**) | **0,741 ± 0,005** |
-| V4 + chỉ unigram | 0,701 ± 0,006 |
-| V4 + n-gram (1,3) | 0,738 ± 0,005 |
+| V4 + chỉ unigram                              | 0,701 ± 0,006           |
+| V4 + n-gram (1,3)                              | 0,738 ± 0,005           |
 
 **Cách đọc:** độ lệch giữa các fold (0,004–0,008) bằng hoặc lớn hơn mức tăng của từng bước làm sạch. Đừng viết trong báo cáo rằng từng bước "cải thiện" kết quả; chỉ có thể nói "không gây hại và cộng lại tăng nhẹ". Hiệu ứng lớn thật là **bigram** (bỏ đi còn 0,701).
 
@@ -159,6 +160,7 @@ Chạy thử cho kết quả hợp lý (ví dụ câu đầu ra `SCREEN→Negati
 ### 4.1. Thư mục `data/`
 
 #### `data/download_data.sh`
+
 - **Là gì:** script bash tải dữ liệu gốc và chuẩn bị dữ liệu xử lý.
 - **Làm gì, theo thứ tự:** (1) tải `UIT-ViSFD.zip` từ GitHub của tác giả nếu chưa có `Train.csv`; (2) giải nén vào `data/raw/`; (3) ghi `SHA256SUMS.txt` để mọi người xác nhận dùng cùng một phiên bản dữ liệu; (4) gọi `python -m src.data.load` để kiểm tra số mẫu và sinh `data/processed/*.jsonl`.
 - **Vì sao quan trọng:** đề yêu cầu "người khác chạy lại được" và "không phân phối lại corpus bị hạn chế". Repo **chỉ chứa script tải, không chứa dữ liệu** (đã có trong `.gitignore`).
@@ -167,6 +169,7 @@ Chạy thử cho kết quả hợp lý (ví dụ câu đầu ra `SCREEN→Negati
 ### 4.2. Thư mục `src/data/`
 
 #### `src/data/schema.py` (định nghĩa nhãn)
+
 - **Là gì:** nơi duy nhất định nghĩa "nhãn là gì" của cả dự án. Mọi người import từ đây, **không ai tự parse nhãn**.
 - **Hằng số:** `ASPECTS` (10 khía cạnh, thứ tự cố định), `POLARITIES` (Positive/Negative/Neutral), `ASPECT2ID`, `POL2ID`, `IGNORE_INDEX = -100`, `OTHERS_TOKEN`.
 - **Hàm:**
@@ -177,12 +180,14 @@ Chạy thử cho kết quả hợp lý (ví dụ câu đầu ra `SCREEN→Negati
 - **Về `{OTHERS}`:** không phải khía cạnh trong 10 khía cạnh, không có cực tính. Được lưu thành cờ `has_others` và **không đưa vào đầu ra**. Phản hồi chỉ có `{OTHERS}` nghĩa là **không có khía cạnh nào** (115 mẫu Train, 18 Dev, 37 Test). Đây là trường hợp hợp lệ; đầu ra đúng là danh sách rỗng.
 
 #### `src/data/load.py` (đọc dữ liệu gốc)
+
 - **Là gì:** đọc ba file CSV gốc và biến mỗi dòng thành một bản ghi chuẩn.
 - **Hàm chính:** `load_split(raw_dir, split)` với `split` ∈ `train`/`dev`/`test`, trả về danh sách `dict` (xem mục 5.2). `main(raw_dir, out_dir)` ghi ra `*.jsonl` và **kiểm tra số mẫu** (`EXPECTED`: 7.786 / 1.112 / 2.224).
 - **Chạy riêng:** `python -m src.data.load data/raw data/processed`.
 - **Ai dùng:** `run_baseline.py`, `ablation_baseline.py`, và mọi mô hình sau này.
 
 #### `src/data/preprocess.py` (tiền xử lý văn bản)
+
 - **Là gì:** một hàm chuẩn hóa văn bản **dùng chung cho mọi mô hình và demo**. Không ai tự viết bản riêng.
 - **`normalize(text, tone=True, teencode=True, repeat=True)`** làm theo thứ tự:
   1. Chuẩn Unicode NFC và chữ thường (3,1% văn bản gốc bị tách dấu, không NFC).
@@ -197,6 +202,7 @@ Chạy thử cho kết quả hợp lý (ví dụ câu đầu ra `SCREEN→Negati
 ### 4.3. Thư mục `src/models/`
 
 #### `src/models/baseline.py` (mô hình đối chứng)
+
 - **Là gì:** baseline theo đề: **TF-IDF + bộ phân loại riêng cho từng khía cạnh**.
 - **Cấu trúc:** một bộ TF-IDF (từ 1–2 gram, giữ token 1 ký tự và dấu câu) **fit chỉ trên Train**; **10 bộ hiện diện** (Logistic Regression nhị phân, `class_weight="balanced"`, C=10); **10 bộ sentiment** (Logistic Regression 3 lớp, C=10), mỗi bộ chỉ huấn luyện trên các mẫu **có mặt** khía cạnh đó. Nhờ vậy khía cạnh vắng không bao giờ bị gán `Neutral`.
 - **Lớp `TfidfBaseline`:** `fit(rows)` huấn luyện; `predict(rows)` trả về `(presence_prob[N,10], sent_pred[N,10])`.
@@ -205,11 +211,13 @@ Chạy thử cho kết quả hợp lý (ví dụ câu đầu ra `SCREEN→Negati
 - **Quan trọng:** `predict()` trả cực tính cho **cả 10 khía cạnh** (kể cả khía cạnh dự đoán vắng). Việc chọn khía cạnh nào xuất ra thuộc về ngưỡng, áp dụng ở bên ngoài.
 
 #### Hợp đồng giao diện cho mô hình mới (rất quan trọng cho TV3, TV4)
+
 Mọi mô hình mới (multitask, separate, aspect-conditioned) nên có hàm `predict(rows)` trả về cùng dạng: **`(presence_prob [N,10], sent_pred [N,10])`**. Khi đó `evaluate.py` và `run_baseline.py`-style script dùng lại được, và các mô hình được so sánh **cùng một cách tính**.
 
 ### 4.4. File đánh giá và chạy
 
 #### `src/evaluate.py` (metric dùng chung)
+
 - **Là gì:** hàm `evaluate(gold_rows, presence_pred, sent_pred)` tính tất cả chỉ số theo mục 13 của đề. **Mọi mô hình dùng đúng hàm này.**
 - **Chỉ số trả về:**
   - `aspect_micro_f1`, `aspect_macro_f1` (+ F1 từng khía cạnh): phát hiện khía cạnh trên ma trận hiện diện, tính trên **mọi mẫu, kể cả mẫu rỗng**.
@@ -219,6 +227,7 @@ Mọi mô hình mới (multitask, separate, aspect-conditioned) nên có hàm `p
 - **Quy tắc đã chốt:** đầu ra rỗng hoặc dự đoán thừa **không bị loại bỏ**; dự đoán thừa tính là FP.
 
 #### `src/run_baseline.py` (chạy baseline từ đầu đến cuối)
+
 - **Là gì:** script gắn các mảnh lại: fit trên Train → dự đoán Dev → chọn ngưỡng → đánh giá → lưu.
 - **Chọn ngưỡng:** một ngưỡng **chung** thử từ 0,20 đến 0,80 (bước 0,05), chọn ngưỡng cho **joint F1 trên Dev cao nhất**. Dùng ngưỡng chung vì ngưỡng riêng từng khía cạnh dễ quá khớp Dev (khía cạnh `STORAGE` chỉ có 14 mẫu Dev).
 - **Đầu ra:** `outputs/metrics/baseline_dev.json`, `outputs/predictions/baseline_dev.jsonl`.
@@ -227,10 +236,12 @@ Mọi mô hình mới (multitask, separate, aspect-conditioned) nên có hàm `p
 ### 4.5. Thư mục `experiments/`
 
 #### `experiments/ablation_baseline.py`
+
 - **Là gì:** bộ khung thí nghiệm: hàm `cv(texts, ...)` chạy 5-fold CV **chỉ trên Train** (vectorizer fit lại trong từng fold), hàm `show(...)` in kết quả. Phần `__main__` chạy 8 cấu hình ở mục 3, bước 5.
 - **Dùng khi:** muốn kiểm chứng một thay đổi tiền xử lý/siêu tham số. Sao chép cách gọi trong `__main__`, **chỉ đổi một yếu tố mỗi lần**.
 
 #### `experiments/audit_text.py`
+
 - **Là gì:** kiểm kê dữ liệu thô của Train, dựa trên số đếm thật.
 - **Nhóm A:** khoảng trắng và ký tự (không NFC, xuống dòng, 2 khoảng trắng, khoảng trắng quanh dấu câu…).
 - **Nhóm B:** biến thể vị trí dấu thanh, kèm tỉ lệ (dạng ít gặp chỉ 0,087% token, 2,92% văn bản).
@@ -240,22 +251,23 @@ Mọi mô hình mới (multitask, separate, aspect-conditioned) nên có hàm `p
 ### 4.6. Thư mục `tests/`
 
 #### `tests/test_preprocess.py` (9 test)
+
 Bảo vệ `normalize()` và `mark_negation()`: giữ phủ định; gộp `ko`/`k` → `không`; giữ `600k`; rút ký tự lặp; giữ chữ lặp hợp lệ (`boong`); chuẩn NFC; chuẩn dấu thanh ở cuối từ (`hoà` → `hòa`) mà vẫn giữ `quý`; **không đổi** `toàn`, `thoại`, `khoảng`…; phạm vi phủ định dừng ở `nhưng`. Mỗi luật tiền xử lý mới **phải** có test kèm phản ví dụ.
 
 ### 4.7. Thư mục `docs/`
 
-| File | Nội dung |
-|---|---|
+| File                     | Nội dung                                                                                                                                                |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `SO_TAY_TIEN_XU_LY.md` | Phương pháp quan sát, chọn lọc và kiểm chứng tiền xử lý; ma trận giữ/bỏ; ablation; tìm chỗ chưa tối ưu; nhật ký quyết định mẫu |
-| `HUONG_DAN_NHOM.md` | Tài liệu này |
+| `HUONG_DAN_NHOM.md`    | Tài liệu này                                                                                                                                          |
 
 ### 4.8. File gốc dự án
 
-| File | Ý nghĩa |
-|---|---|
-| `.gitignore` | Loại `data/raw/`, `data/processed/`, kết quả và checkpoint, cache. Không đẩy dữ liệu của tác giả lên repo |
-| `requirements.txt` | Danh sách thư viện (do nhóm tạo) |
-| `src/__init__.py`, `src/data/__init__.py`, `src/models/__init__.py` | File rỗng để Python coi các thư mục là package; **cần giữ** vì code dùng `from src...` |
+| File                                                                      | Ý nghĩa                                                                                                                  |
+| ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `.gitignore`                                                            | Loại `data/raw/`, `data/processed/`, kết quả và checkpoint, cache. Không đẩy dữ liệu của tác giả lên repo |
+| `requirements.txt`                                                      | Danh sách thư viện (do nhóm tạo)                                                                                      |
+| `src/__init__.py`, `src/data/__init__.py`, `src/models/__init__.py` | File rỗng để Python coi các thư mục là package; **cần giữ** vì code dùng `from src...`                  |
 
 ---
 
@@ -271,15 +283,15 @@ Năm cột: `index`, `comment` (văn bản phản hồi), `n_star` (số sao 1�
 
 Mỗi dòng một đối tượng JSON:
 
-| Trường | Ý nghĩa |
-|---|---|
-| `id` | Dạng `dev-0`, `train-15`… (split + chỉ số gốc) |
-| `text` | Văn bản gốc, **chưa chuẩn hóa** (chuẩn hóa làm khi cần, bằng `normalize()`) |
-| `n_star` | Số sao |
-| `pairs` | `{khía cạnh: cực tính}` của các khía cạnh có mặt, ví dụ `{"GENERAL": "Positive"}` |
-| `has_others` | Có token `{OTHERS}` hay không |
-| `presence` | 10 số 0/1 theo thứ tự `ASPECTS` |
-| `sentiment` | 10 số: 0=Positive, 1=Negative, 2=Neutral, hoặc **−100** nếu khía cạnh vắng |
+| Trường       | Ý nghĩa                                                                                         |
+| -------------- | ------------------------------------------------------------------------------------------------- |
+| `id`         | Dạng `dev-0`, `train-15`… (split + chỉ số gốc)                                           |
+| `text`       | Văn bản gốc, **chưa chuẩn hóa** (chuẩn hóa làm khi cần, bằng `normalize()`)    |
+| `n_star`     | Số sao                                                                                           |
+| `pairs`      | `{khía cạnh: cực tính}` của các khía cạnh có mặt, ví dụ `{"GENERAL": "Positive"}` |
+| `has_others` | Có token `{OTHERS}` hay không                                                                 |
+| `presence`   | 10 số 0/1 theo thứ tự `ASPECTS`                                                              |
+| `sentiment`  | 10 số: 0=Positive, 1=Negative, 2=Neutral, hoặc **−100** nếu khía cạnh vắng           |
 
 Ví dụ: `"presence": [0,0,0,0,0,0,0,0,1,1]`, `"sentiment": [-100,...,-100,0,0]` nghĩa là có `GENERAL` và `SER&ACC`, cả hai Positive.
 
@@ -296,23 +308,27 @@ Các trường của `evaluate()` (mục 4.4), thêm `threshold`, `split`, `mode
 ## 6. Khái niệm cốt lõi mà mọi thành viên phải hiểu
 
 ### 6.1. Hai bài toán con
+
 1. **Hiện diện (presence):** với mỗi khía cạnh, câu có nhắc tới không? (nhị phân)
 2. **Cực tính (sentiment):** nếu có, khen, chê hay trung tính? (3 lớp)
 
 Hệ thống end-to-end = hiện diện **rồi** cực tính trên các khía cạnh được dự đoán là có mặt.
 
 ### 6.2. Vì sao có nhãn −100
+
 Khía cạnh vắng **không có cực tính**. Nhãn `−100` báo cho hàm loss (`ignore_index=-100`) biết "bỏ qua vị trí này". Nếu gán `Neutral` cho khía cạnh vắng, mô hình học sai rằng "không nhắc" là "trung tính".
 
 > **Cảnh báo cho TV3:** nếu một batch **không có khía cạnh nào hiện diện** (Train có 115 mẫu như vậy), loss sentiment trung bình trên tập rỗng có thể ra NaN. Cần viết test cho trường hợp này (ví dụ chia tổng cho `max(số phần tử hợp lệ, 1)`).
 
 ### 6.3. Chỉ số đúng và chỉ số "chẩn đoán"
+
 - **Joint F1** là chỉ số end-to-end: phạt cả khía cạnh bỏ sót, khía cạnh dự đoán thừa, và cực tính sai.
 - **Sentiment macro-F1 biết trước khía cạnh** chỉ cho biết phần cực tính tốt đến đâu. Nếu chỉ báo số này rồi gọi là "end-to-end" thì mắc đúng lỗi mà đề cảnh báo.
 
 ### 6.4. Ví dụ tính tay (đã kiểm chứng bằng `evaluate()`)
 
 Hai câu:
+
 - Câu 1: gold = {BATTERY→Positive, SCREEN→Negative}; dự đoán = {BATTERY→Positive, SCREEN→**Positive**, CAMERA→Positive}.
 - Câu 2: gold rỗng (chỉ có `OTHERS`); dự đoán rỗng.
 
@@ -321,6 +337,7 @@ Joint (cặp đúng cả khía cạnh lẫn cực tính): TP = 1 (BATTERY); FP =
 Aspect micro-F1 (chỉ xét có mặt hay không): phát hiện đúng BATTERY và SCREEN (TP = 2), thừa CAMERA (FP = 1), không bỏ sót → **0,8**. Một câu dự đoán đúng khía cạnh nhưng sai cực tính vẫn tăng aspect F1 mà không tăng joint F1.
 
 ### 6.5. Ngưỡng
+
 `presence_prob ≥ ngưỡng` thì xem khía cạnh là có mặt. Ngưỡng cao ⇒ ít dự đoán thừa nhưng bỏ sót nhiều hơn. Ngưỡng **chọn trên Dev**, không chọn trên Test.
 
 ---
@@ -339,12 +356,14 @@ Aspect micro-F1 (chỉ xét có mặt hay không): phát hiện đúng BATTERY v
 8. **Không giả định mô hình chính thắng baseline** và không ghi con số hiệu năng trước khi chạy thực nghiệm.
 
 ### 7.2. Quy tắc code
+
 - Mỗi mô hình mới nằm trong `src/models/<tên>.py`, tuân theo hợp đồng giao diện ở mục 4.3.
 - Mỗi luật tiền xử lý mới: có tần suất đo được, đã đọc ngữ cảnh, test có phản ví dụ, và **đã áp dụng lên toàn bộ từ vựng rồi đọc danh sách từ bị đổi** (xem mục 3.6 của sổ tay tiền xử lý).
 - Cấu hình thí nghiệm lưu thành file trong `configs/` (ghi seed và siêu tham số); kết quả lưu vào `outputs/metrics/`, dự đoán vào `outputs/predictions/`, tên theo dạng `<mô hình>_<tập>` hoặc `<mô hình>_s<seed>`.
 - Mỗi người một nhánh git, merge qua pull request, người rà soát khác người viết (theo vòng tròn trong file phân công).
 
 ### 7.3. Cách thêm một mô hình mới (ví dụ `multitask.py`)
+
 1. Viết `src/models/multitask.py` với `fit(rows)` và `predict(rows) → (presence_prob, sent_pred)`.
 2. Viết script chạy (theo mẫu `run_baseline.py`): fit Train, dự đoán Dev, chọn ngưỡng Dev, gọi `evaluate()`, lưu metrics và predictions.
 3. Viết test (đặc biệt: loss mask, batch không có khía cạnh nào, hình dạng tensor).
@@ -354,32 +373,32 @@ Aspect micro-F1 (chỉ xét có mặt hay không): phát hiện đúng BATTERY v
 
 ## 8. Việc chưa có trong repo và người phụ trách
 
-| File dự kiến | Nội dung | Phụ trách (theo phân công 5 người) |
-|---|---|---|
-| `src/data/dataset.py` | Dataset PyTorch, tokenize, collate, nhãn −100 | TV1 |
-| `src/models/multitask.py`, `src/train.py`, `configs/multitask.yaml` | Encoder đa nhiệm, huấn luyện, 3 seed | TV3 |
-| `src/models/separate.py`, `src/models/conditioned.py` | Đối chứng và mở rộng aspect-conditioned | TV4 |
-| `tests/test_schema.py`, `tests/test_evaluate.py` | Test schema và metric bằng ví dụ tính tay (mục 6.4 dùng được ngay) | TV1, TV2 |
-| `src/pipeline.py`, `tests/test_pipeline.py`, `demo/app.py` | Text → `[{aspect, sentiment}]`, test trường hợp biên, demo Gradio | TV5 |
-| `notebooks/01_eda.ipynb`, `02_baseline_check.ipynb`, `03_error_analysis.ipynb` | Khảo sát dữ liệu, kiểm tra tay, phân tích lỗi | TV1, TV2, TV5 |
-| `README.md` (gốc), `CONTRIBUTIONS.md` | Hướng dẫn chạy lại, nhật ký đóng góp và khảo sát | TV4 |
-| `.github/workflows/ci.yml` | CI nhẹ: pytest + ruff | TV4 |
+| File dự kiến                                                                       | Nội dung                                                                    | Phụ trách (theo phân công 5 người) |
+| ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- | ---------------------------------------- |
+| `src/data/dataset.py`                                                              | Dataset PyTorch, tokenize, collate, nhãn −100                              | TV1                                      |
+| `src/models/multitask.py`, `src/train.py`, `configs/multitask.yaml`            | Encoder đa nhiệm, huấn luyện, 3 seed                                     | TV3                                      |
+| `src/models/separate.py`, `src/models/conditioned.py`                            | Đối chứng và mở rộng aspect-conditioned                                | TV4                                      |
+| `tests/test_schema.py`, `tests/test_evaluate.py`                                 | Test schema và metric bằng ví dụ tính tay (mục 6.4 dùng được ngay) | TV1, TV2                                 |
+| `src/pipeline.py`, `tests/test_pipeline.py`, `demo/app.py`                     | Text → `[{aspect, sentiment}]`, test trường hợp biên, demo Gradio     | TV5                                      |
+| `notebooks/01_eda.ipynb`, `02_baseline_check.ipynb`, `03_error_analysis.ipynb` | Khảo sát dữ liệu, kiểm tra tay, phân tích lỗi                        | TV1, TV2, TV5                            |
+| `README.md` (gốc), `CONTRIBUTIONS.md`                                           | Hướng dẫn chạy lại, nhật ký đóng góp và khảo sát                | TV4                                      |
+| `.github/workflows/ci.yml`                                                         | CI nhẹ: pytest + ruff                                                       | TV4                                      |
 
 ---
 
 ## 9. Xử lý lỗi thường gặp
 
-| Hiện tượng | Nguyên nhân thường gặp | Cách xử lý |
-|---|---|---|
-| `ModuleNotFoundError: No module named 'src'` | Chạy không phải từ thư mục gốc, hoặc thiếu `__init__.py` | `cd absa-vi-phone`; chạy bằng `python -m src.run_baseline`, không phải `python src/run_baseline.py` |
-| `FileNotFoundError: data/raw/Train.csv` | Chưa chạy bước tải dữ liệu | `bash data/download_data.sh` |
-| `curl` lỗi / không tải được | Mạng chặn GitHub | Tải zip thủ công (mục 3, bước 1) |
-| `bash: command not found` trên Windows | Không có bash | Git Bash hoặc WSL, hoặc làm thủ công |
-| `AssertionError` về số mẫu khi tải | Dữ liệu tải về khác phiên bản chuẩn | So SHA256; báo cả nhóm; không tự sửa số `EXPECTED` |
-| `UnicodeDecodeError` khi đọc CSV | Mở bằng sai mã hóa | Luôn dùng `encoding="utf-8"` |
-| `ConvergenceWarning` | Logistic Regression chưa hội tụ trong giới hạn lặp | Thường vô hại với cấu hình hiện tại; nếu bật, tăng `max_iter` |
-| Kết quả lệch vài phần nghìn so với tài liệu | Phiên bản thư viện khác | Bình thường; lệch lớn thì kiểm tra lại các bước |
-| `ValueError: Token nhãn không hợp lệ` | Dữ liệu có nhãn lạ | Không bỏ qua; báo TV1 để xem xét schema |
+| Hiện tượng                                        | Nguyên nhân thường gặp                                         | Cách xử lý                                                                                                 |
+| ---------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `ModuleNotFoundError: No module named 'src'`       | Chạy không phải từ thư mục gốc, hoặc thiếu `__init__.py` | `cd absa-vi-phone`; chạy bằng `python -m src.run_baseline`, không phải `python src/run_baseline.py` |
+| `FileNotFoundError: data/raw/Train.csv`            | Chưa chạy bước tải dữ liệu                                   | `bash data/download_data.sh`                                                                                |
+| `curl` lỗi / không tải được                  | Mạng chặn GitHub                                                  | Tải zip thủ công (mục 3, bước 1)                                                                        |
+| `bash: command not found` trên Windows            | Không có bash                                                     | Git Bash hoặc WSL, hoặc làm thủ công                                                                     |
+| `AssertionError` về số mẫu khi tải             | Dữ liệu tải về khác phiên bản chuẩn                         | So SHA256; báo cả nhóm; không tự sửa số `EXPECTED`                                                   |
+| `UnicodeDecodeError` khi đọc CSV                 | Mở bằng sai mã hóa                                              | Luôn dùng `encoding="utf-8"`                                                                              |
+| `ConvergenceWarning`                               | Logistic Regression chưa hội tụ trong giới hạn lặp            | Thường vô hại với cấu hình hiện tại; nếu bật, tăng `max_iter`                                   |
+| Kết quả lệch vài phần nghìn so với tài liệu | Phiên bản thư viện khác                                        | Bình thường; lệch lớn thì kiểm tra lại các bước                                                    |
+| `ValueError: Token nhãn không hợp lệ`          | Dữ liệu có nhãn lạ                                             | Không bỏ qua; báo TV1 để xem xét schema                                                                 |
 
 ---
 
