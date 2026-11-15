@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from src.data.schema import ASPECTS, IGNORE_INDEX, POL2ID, to_vectors
+from src.data.schema import to_vectors
 from src.evaluate import _prf, evaluate
 
 

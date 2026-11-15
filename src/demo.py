@@ -23,7 +23,7 @@ import json
 import sys
 from pathlib import Path
 
-from src.pipeline import ABSAPipeline, ASPECT_METADATA, POLARITY_METADATA
+from src.pipeline import ABSAPipeline, POLARITY_METADATA
 
 
 def print_banner(model_name: str, device: str):
