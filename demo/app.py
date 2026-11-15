@@ -8,7 +8,13 @@ Khởi chạy ứng dụng:
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
+
+# Thêm thư mục gốc vào sys.path để import được src khi chạy python demo/app.py
+ROOT_DIR = Path(__file__).resolve().parent.parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 
 import gradio as gr
 import numpy as np
