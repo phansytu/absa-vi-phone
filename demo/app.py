@@ -23,6 +23,7 @@ from src.pipeline import ABSAPipeline, ASPECT_METADATA, POLARITY_METADATA
 from src.data.schema import ASPECTS
 
 # Khởi tạo pipeline mặc định
+CHECKPOINT_FILE = Path("outputs/checkpoints/multitask_seed42.pt")
 pipeline = ABSAPipeline(model_type="auto")
 
 
@@ -37,9 +38,22 @@ def analyze_text(text: str, model_choice: str, threshold_val: float):
 
     # Đổi mô hình nếu người dùng chọn khác với mô hình hiện tại
     target_type = "multitask" if "MultiTask" in model_choice else "baseline"
+    model_notice = ""
+
     if pipeline.active_model != target_type:
-        pipeline.model_type = target_type
-        pipeline._load_model()
+        try:
+            pipeline.model_type = target_type
+            pipeline._load_model()
+        except FileNotFoundError:
+            # Fallback an toàn về Baseline nếu chưa có checkpoint
+            pipeline.model_type = "baseline"
+            pipeline._load_model()
+            model_notice = (
+                "<div style='background-color: #fff3cd; border-left: 5px solid #ffc107; padding: 12px 16px; margin-bottom: 15px; border-radius: 6px; color: #856404; font-size: 14px;'>"
+                "⚠️ <b>Thông báo:</b> Chưa có file trọng số <code>outputs/checkpoints/multitask_seed42.pt</code> trên máy. "
+                "Hệ thống đã tự động chuyển sang phân tích bằng <b>Mô hình Baseline TF-IDF (Joint F1 = 0.7487)</b>."
+                "</div>"
+            )
 
     # Cập nhật ngưỡng
     pipeline.thresholds = np.full(len(ASPECTS), float(threshold_val))
@@ -50,7 +64,9 @@ def analyze_text(text: str, model_choice: str, threshold_val: float):
     # 1. Tạo giao diện HTML trực quan
     html_cards = []
     html_cards.append("<div style='font-family: Arial, sans-serif;'>")
-    html_cards.append(f"<p><b>Văn bản sau tiền xử lý:</b> <i>{result['normalized']}</i></p>")
+    if model_notice:
+        html_cards.append(model_notice)
+    html_cards.append(f"<p><b>Mô hình đang chạy:</b> <code>{pipeline.active_model.upper()}</code> | <b>Văn bản sau tiền xử lý:</b> <i>{result['normalized']}</i></p>")
 
     if not preds:
         html_cards.append(
@@ -154,10 +170,12 @@ def create_demo():
                     btn_clear = gr.Button("Xóa")
 
             with gr.Column(scale=2):
+                default_model = "MultiTask ViSoBERT (Mô hình sâu)" if CHECKPOINT_FILE.exists() else "Baseline TF-IDF"
                 model_choice = gr.Radio(
-                    choices=["MultiTask ViSoBERT (Mô hình sâu)", "Baseline TF-IDF"],
-                    value="MultiTask ViSoBERT (Mô hình sâu)",
+                    choices=["Baseline TF-IDF", "MultiTask ViSoBERT (Mô hình sâu)"],
+                    value=default_model,
                     label="Chọn mô hình:",
+                    info="Nếu chưa tải checkpoint .pt của PhoBERT, hệ thống sẽ tự động dùng Baseline."
                 )
                 threshold_slider = gr.Slider(
                     minimum=0.1,
