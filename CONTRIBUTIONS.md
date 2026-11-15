@@ -75,7 +75,7 @@
 - [x] **Kiểm kê dữ liệu thô (`experiments/audit_text.py`):**
   - Đo đạc tỷ lệ bất thường khoảng trắng, biến thể dấu thanh và lỗi telex trên dữ liệu thực.
 - [x] **Thiết lập CI/CD & Cấu hình:**
-  - Hoàn thiện `.github/workflows/ci.yml`, các file cấu hình `configs/baseline.yaml`, `configs/separate.yaml`, `configs/aspect_conditioned.yaml`.
+  - Hoàn thiện `.github/workflows/ci.yml`, các file cấu hình `configs/baseline.yaml`, `configs/multitask.yaml`.
   - Soạn thảo tài liệu `README.md`, `LICENSE`, `CONTRIBUTIONS.md`.
 
 ### Thành viên 5 (TV5): End-to-End Pipeline, CLI & Web Application

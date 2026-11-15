@@ -1,12 +1,11 @@
 """Pipeline xử lý từ đầu đến cuối (End-to-End ABSA Pipeline) cho tiếng Việt.
 
-Nhận văn bản thô -> Tiền xử lý -> Mô hình (MultiTask ViSoBERT hoặc Baseline) -> Áp dụng ngưỡng ->
-Trả về danh sách các cặp {aspect, sentiment} cho các khía cạnh có mặt.
+Nhận văn bản thô -> Tiền xử lý -> Mô hình (MultiTask ViSoBERT hoặc Baseline) ->
+Áp dụng ngưỡng -> Trả về danh sách các cặp {aspect, sentiment} cho các khía cạnh có mặt.
 """
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
@@ -15,7 +14,7 @@ import torch
 from transformers import AutoTokenizer
 
 from src.data.preprocess import normalize
-from src.data.schema import ASPECTS, POLARITES, IGNORE_INDEX
+from src.data.schema import ASPECTS, POLARITES
 from src.models.multitask import MultiTaskABSA
 
 
@@ -74,6 +73,17 @@ class ABSAPipeline:
 
         self._load_model()
 
+    def _init_thresholds(self, ckpt: dict):
+        if self.user_threshold is not None:
+            if isinstance(self.user_threshold, (int, float)):
+                self.thresholds = np.full(len(ASPECTS), float(self.user_threshold))
+            else:
+                self.thresholds = np.asarray(self.user_threshold, dtype=float)
+        elif "thresholds" in ckpt and ckpt["thresholds"] is not None:
+            self.thresholds = np.asarray(ckpt["thresholds"], dtype=float)
+        else:
+            self.thresholds = np.full(len(ASPECTS), 0.5)
+
     def _load_model(self):
         use_multitask = False
         if self.model_type in ("auto", "multitask"):
@@ -107,17 +117,7 @@ class ABSAPipeline:
         model.to(self.device)
         model.eval()
         self.model = model
-
-        # Lấy ngưỡng lưu trong checkpoint
-        if self.user_threshold is not None:
-            if isinstance(self.user_threshold, (int, float)):
-                self.thresholds = np.full(len(ASPECTS), float(self.user_threshold))
-            else:
-                self.thresholds = np.asarray(self.user_threshold, dtype=float)
-        elif "thresholds" in ckpt and ckpt["thresholds"] is not None:
-            self.thresholds = np.asarray(ckpt["thresholds"], dtype=float)
-        else:
-            self.thresholds = np.full(len(ASPECTS), 0.5)
+        self._init_thresholds(ckpt)
 
     def _load_baseline_model(self):
         from src.data.load import load_split
@@ -279,4 +279,3 @@ class ABSAPipeline:
     def predict_one(self, text: str, detailed: bool = False):
         """Tiện ích phân tích 1 câu đơn lẻ."""
         return self.predict(text, detailed=detailed)
-

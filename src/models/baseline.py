@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.sparse import hstack
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 
@@ -22,12 +23,31 @@ class TfidfBaseline:
         ngram=(1, 2),
         min_df=2,
         seed=42,
+        char_ngram=None,   # vd (2, 4): them TF-IDF ky tu; None = tat (nhu cu)
     ):
         self.Cp, self.Cs, self.neg_scope = C_presence, C_sent, neg_scope
         self.ngram, self.min_df, self.seed = ngram, min_df, seed
+        self.char_ngram = char_ngram
         self.vec = None
+        self.cvec = None
         self.pres = []
         self.sent = []
+
+    def _fit_transform(self, texts):
+        X = self.vec.fit_transform(texts)
+        if self.char_ngram:
+            self.cvec = TfidfVectorizer(
+                analyzer="char_wb", ngram_range=self.char_ngram, min_df=self.min_df,
+                sublinear_tf=True, lowercase=False,
+            )
+            X = hstack([X, self.cvec.fit_transform(texts)]).tocsr()
+        return X
+
+    def _transform(self, texts):
+        X = self.vec.transform(texts)
+        if self.cvec is not None:
+            X = hstack([X, self.cvec.transform(texts)]).tocsr()
+        return X
 
     def fit(self, rows):
         texts = [prep(r["text"], self.neg_scope) for r in rows]
@@ -38,7 +58,7 @@ class TfidfBaseline:
             sublinear_tf=True,
             lowercase=False,
         )
-        X = self.vec.fit_transform(texts)
+        X = self._fit_transform(texts)
         P = np.array([r["presence"] for r in rows])
         S = np.array([r["sentiment"] for r in rows])
 
@@ -78,7 +98,7 @@ class TfidfBaseline:
 
     def predict(self, rows):
         """Trả về (presence_prob[N, 10], sent_pred[N, 10])."""
-        X = self.vec.transform([prep(r["text"], self.neg_scope) for r in rows])
+        X = self._transform([prep(r["text"], self.neg_scope) for r in rows])
         n_samples = X.shape[0]
 
         # Dự đoán xác suất hiện diện (Presence probabilities)

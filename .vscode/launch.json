@@ -1,0 +1,48 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "🌐 1. Chạy Web Demo (Gradio App)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/demo/app.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "💬 2. Dự đoán Tương tác (CLI Interactive)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.predict",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "📊 3. Huấn luyện Baseline (TF-IDF)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.run_baseline",
+            "args": ["data/raw", "outputs"],
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "🚀 4. Huấn luyện MultiTask ViSoBERT",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.train",
+            "args": ["--config", "configs/multitask.yaml", "--seed", "42"],
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "🧪 5. Chạy Kiểm thử (Pytest)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": ["-v", "tests"],
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+    ]
+}
