@@ -1,0 +1,21 @@
+﻿id,text,pred_text,pred_labels,n_pred,max_prob,category
+dev-221,nể mấy anh thật sự giá tầm trung mua đòi chơi game nặng cũng sợ thật mua ip mà chơi game cho mượt tiền ít đòi hít đồ thơm à,PERFORMANCE→Positive | PRICE→Positive,"PERFORMANCE,PRICE",2,0.9957,khác
+dev-859,"Mới tậu xong dc 3h, ko biết xài thế nào nên nhờ google đánh giá thấy 90% mn đều khuyên ko nên mua, nên thấy bối rối wa, dòng này mới ra sao lại kém chất lượng hơn đời trc nhìu vậy, mình mới bỏ kon A20 nên thấy đánh giá có vẻ kém xa A20, mn đánh giá chân thật jup mình vs, chứ thấy chê nhìu vậy xót tiền quá",PRICE→Negative | GENERAL→Negative,"PRICE,GENERAL",2,0.9877,khác
+dev-215,Máy này mua về chơi game ổn không ai đang sào cho mình thêm chút ý kiến để mua máy với,PERFORMANCE→Positive | GENERAL→Positive,"PERFORMANCE,GENERAL",2,0.9664,phủ định
+dev-107,Máy vivo y11 sạc pin từ 1% đến 100% là hết bao lâu vậy ạ !? Và máy không hỗ trợ sạc nhanh nhưng mình sạc cốc sạc q.c 3.0 hoặc 4.0 có được ko !?,BATTERY→Negative,BATTERY,1,0.9115,câu hỏi
+dev-720,"Với sản phẩm này sẽ thích hợp với người chỉ đọc báo, xem phim . Nếu quay video hoặc edit video với độ xử lý nhanh thì không nên mua",PERFORMANCE→Neutral,PERFORMANCE,1,0.8759,phủ định
+dev-42,"Nó còn bị nhiệt khi chơi game nữa ko và nó chơi game ngon hơn realme 5 pro ko 
+Mong shop trả lời",PERFORMANCE→Negative,PERFORMANCE,1,0.8119,điều kiện
+dev-523,Mới dùng cũng chưa thấy hiện tượng gì.còn về sau thì chưa biết .cũng mong là k bị gì.,GENERAL→Neutral,GENERAL,1,0.8115,phủ định
+dev-379,Đa số dien thoai gio toan tq với vietnam sản xuất nên dùng thay ngon ..ngon ngon mà dùng lâu lâu thì het dùng duoc .zui gê.. ai bit seo !!..,GENERAL→Positive,GENERAL,1,0.8034,khác
+dev-1019,Dang xài và mình có làm một bài tes về game pubg các bạn tham khảo nhé https://youtu.be/cyGvQdil4us,PERFORMANCE→Neutral,PERFORMANCE,1,0.7758,khác
+dev-132,Trong lúc chơi game nó hay hiện cái viền xanh ngày nút thoát ko biết nó có bị lỗi gì ko anh,PERFORMANCE→Negative,PERFORMANCE,1,0.6925,khác
+dev-885,"Không biết mẫu này chừng nào có tại TP. Bến Tre vậy nhờ.
+Cho mình biết để mình chờ. Và mức giá giao động từ khoảng nào vậy. 
+Theo như thông số. Thì ngoài Camera sau, gần như không  có gì khác biệt với mẫu 9s",CAMERA→Negative | PRICE→Neutral,"CAMERA,PRICE",2,0.6853,phủ định
+dev-765,Cho em hỏi iphone 7 plus của e mới mua đúng 2 tháng và giờ số đo dung lượng pin còn 99% vậy có s k vậy qtv,BATTERY→Negative,BATTERY,1,0.5761,khác
+dev-710,Tính mua thêm máy này sài. Thấy đánh giá của các bạn lỗi nhiều woa. Nên thôi mua máy khác vậy. Cam ơn chia sẻ của anh em hội làng nhe,GENERAL→Negative,GENERAL,1,0.5689,khác
+dev-966,"Cửa hàng mình có mua lại máy không
+Máy còn nguyên
+Lấy từ điện máy xanh 
+Djjsoeenjskssj",SER&ACC→Negative,SER&ACC,1,0.5111,phủ định

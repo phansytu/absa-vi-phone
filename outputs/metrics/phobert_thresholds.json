@@ -1,0 +1,12 @@
+{
+    "SCREEN": 0.55,
+    "CAMERA": 0.50,
+    "FEATURES": 0.40,
+    "BATTERY": 0.60,
+    "PERFORMANCE": 0.50,
+    "STORAGE": 0.20,
+    "DESIGN": 0.40,
+    "PRICE": 0.55,
+    "GENERAL": 0.60,
+    "SER&ACC": 0.50
+}
