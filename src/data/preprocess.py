@@ -16,15 +16,16 @@ _TONE_RE = re.compile(r"(?<!q)(" + "|".join(map(re.escape, _TONE)) + r")(?!\w)")
 
 # Teencode/viết tắt thông dụng
 _TEEN = {
+    # KHONG them: "sd" (the SD), "c" (type C), "s" (Galaxy S) -> se pha tu khoa STORAGE / cong sac.
     "không": ["ko", "kg", "hok", "hk", "hong", "hông", "khong", "khôg", "khg"],
     "được": ["dc", "đc"], "điện thoại": ["dt", "đt"], "sản phẩm": ["sp"],
-    "nhân viên": ["nv"], "mọi người": ["mn"], "mình": ["mk", "mik", "mih"],
+    "nhân viên": ["nv"], "mọi người": ["mn"], 
     "với": ["vs"], "wifi": ["wf"], "cũng": ["cx"], "ok": ["oke", "oki", "okê", "okie", "okay"],
     "pin": ["bin"], "gì": ["j"], "rồi": ["r"], "bình thường": ["bt", "bth"],
-    "sử dụng": ["sd"], "trước": ["trc"], "luôn": ["lun"], "nhưng": ["nhưg"],
+    "trước": ["trc"], "luôn": ["lun"], "nhưng": ["nhưg"],
     # thêm trường hợp xử lý 
-    "sao" : ["s"], "thấy" : ["thasy", "thsay", "thaays"], "thích" : ["thik", "thíc", "thíck", "thíc"],
-    "biết" : ["bjk", "bít", "bik", "bít"], "cái" : ["c"], "có" : ["có", "co", "có"],
+    "thấy" : ["thasy", "thsay", "thaays"], "thích" : ["thik", "thíc", "thíck", "thíc"],
+    "biết" : ["bjk", "bít", "bik", "bít"], "có" : ["co"],
     "mình" : ["mk", "mik", "mih", "mh"],
     "khét" : ["khet", "khets"]
 }
