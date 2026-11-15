@@ -14,7 +14,8 @@ from src.data.preprocess import normalize, mark_negation
 from src.data.schema import IGNORE_INDEX
 from src.evaluate import evaluate
 
-RAW_DIR = sys.argv[1] if len(sys.argv) > 1 else "data/raw"
+from pathlib import Path
+RAW_DIR = Path(sys.argv[1] if len(sys.argv) > 1 else "data/raw")
 TR = load_split(RAW_DIR, "train")
 P = np.array([r["presence"] for r in TR])
 S = np.array([r["sentiment"] for r in TR])
