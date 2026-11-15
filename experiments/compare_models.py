@@ -176,7 +176,14 @@ def main():
     with open(out_dir / "comparison.md", "w", encoding="utf-8") as f:
         f.write("# So sánh Baseline V2C vs PhoBERT\n\n")
         f.write(f"*Số seed PhoBERT: {n_seeds} (seeds: {phobert_seeds_found})*\n\n")
-        f.write(df.to_markdown(index=False))
+        try:
+            f.write(df.to_markdown(index=False))
+        except Exception:
+            cols = [str(c) for c in df.columns]
+            f.write("| " + " | ".join(cols) + " |\n")
+            f.write("| " + " | ".join(["---"] * len(cols)) + " |\n")
+            for _, r in df.iterrows():
+                f.write("| " + " | ".join(str(r[c]) for c in cols) + " |\n")
         f.write("\n\n## Delta (PhoBERT - Baseline)\n\n")
         for k, v in deltas.items():
             sign = "+" if v > 0 else ""
