@@ -1,0 +1,30 @@
+{
+ "cfg": {
+  "encoder": "uitnlp/visobert",
+  "max_length": 128,
+  "pooling": "mean",
+  "batch_size": 32,
+  "epochs": 6,
+  "lr_encoder": 2e-05,
+  "lr_head": 0.0005,
+  "lambda": 1.0,
+  "norm": {
+   "tone": true,
+   "teencode": true,
+   "repeat": true
+  }
+ },
+ "dev": {
+  "n_samples": 200.0,
+  "aspect_micro_f1": 0.5095017976373909,
+  "aspect_macro_f1": 0.4260493889515441,
+  "n_gold_present_pairs": 558.0,
+  "sentiment_macro_f1_given_gold_aspect": 0.4909210015285295,
+  "joint_precision": 0.22750179985601152,
+  "joint_recall": 0.5663082437275986,
+  "joint_f1": 0.3246019517205958,
+  "n_gold_empty": 4.0,
+  "gold_empty_predicted_empty_rate": 0.0
+ },
+ "epoch": 5
+}

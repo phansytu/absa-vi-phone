@@ -1,0 +1,16 @@
+# Cấu hình cho kiến trúc Aspect-Conditioned (câu ghép cùng tên khía cạnh [CLS] Text [SEP] Aspect [SEP])
+encoder: uitnlp/visobert
+max_length: 160
+pooling: cls
+batch_size: 32
+epochs: 5
+lr_encoder: 2.0e-5
+lr_head: 3.0e-4
+dropout: 0.15
+# Bài toán 4 lớp: 0=Absent, 1=Positive, 2=Negative, 3=Neutral
+n_classes: 4
+seed: 42
+norm:
+  tone: true
+  teencode: true
+  repeat: true

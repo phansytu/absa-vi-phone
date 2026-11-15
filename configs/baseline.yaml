@@ -1,0 +1,15 @@
+# Cấu hình cho mô hình TF-IDF Baseline + Logistic Regression
+model_name: tfidf_baseline
+C_presence: 10.0
+C_sent: 10.0
+neg_scope: 2
+ngram_range: [1, 2]
+min_df: 2
+sublinear_tf: true
+threshold_grid: [0.2, 0.81, 0.05]
+default_threshold: 0.45
+seed: 42
+norm:
+  tone: true
+  teencode: true
+  repeat: true
