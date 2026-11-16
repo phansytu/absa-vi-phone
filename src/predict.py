@@ -36,7 +36,22 @@ def predict(model, loader, device):
 
 
 def main():
-    ap = argparse.ArgumentParser()
+    import sys
+
+    # Nếu truyền các cờ tương tác/dự đoán câu lẻ (--text, --interactive, -i, --file, --model)
+    # hoặc người dùng chạy trực tiếp `python -m src.predict` không kèm tham số:
+    interactive_flags = {"--text", "--file", "--output", "--interactive", "-i", "--model", "--checkpoint", "--detailed", "-d"}
+    has_interactive = any(arg in interactive_flags for arg in sys.argv[1:])
+    has_batch = any(arg in {"--split", "--seed", "--tag", "--thresholds", "--config"} for arg in sys.argv[1:])
+
+    if has_interactive or (not has_batch and len(sys.argv) == 1):
+        from src.demo import main as demo_main
+        demo_main()
+        return
+
+    ap = argparse.ArgumentParser(
+        description="Xuất dự đoán từ Checkpoint mô hình sâu sang file JSONL (hoặc dùng --text/--interactive để phân tích trực tiếp)."
+    )
     ap.add_argument(
         "--config",
         default="configs/multitask.yaml",
