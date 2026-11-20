@@ -20,7 +20,7 @@ from src.data.schema import ASPECTS
 pipeline = ABSAPipeline(model_type="auto")
 
 
-def analyze_text(text: str, model_choice: str, threshold_val: float):
+def analyze_text(text: str, model_choice: str, use_tuned_thresholds: bool, threshold_val: float):
     if not text or not text.strip():
         return (
             "<div style='padding: 20px; text-align: center; color: #888; font-size: 16px;'>"
@@ -30,13 +30,20 @@ def analyze_text(text: str, model_choice: str, threshold_val: float):
         )
 
     # Đổi mô hình nếu người dùng chọn khác với mô hình hiện tại
-    target_type = "multitask" if "MultiTask" in model_choice else "baseline"
+    target_type = "multitask" if "PhoBERT" in model_choice else "baseline"
     if pipeline.active_model != target_type:
         pipeline.model_type = target_type
-        pipeline._load_model()
+        try:
+            pipeline._load_model()
+        except FileNotFoundError as exc:
+            return f"<p>{exc}</p>", "", {}
 
-    # Cập nhật ngưỡng
-    pipeline.thresholds = np.full(len(ASPECTS), float(threshold_val))
+    # Mặc định dùng ngưỡng đã tinh chỉnh cho từng khía cạnh; chỉ dùng ngưỡng
+    # chung nếu người dùng chủ động tắt lựa chọn này.
+    if not use_tuned_thresholds:
+        pipeline.thresholds = np.full(len(ASPECTS), float(threshold_val))
+    else:
+        pipeline.thresholds = pipeline.tuned_thresholds.copy()
 
     result = pipeline.predict(text, detailed=True)
     preds = result["predictions"]
@@ -113,7 +120,8 @@ def analyze_text(text: str, model_choice: str, threshold_val: float):
         {
             "text": result["text"],
             "predictions": preds,
-            "threshold": threshold_val,
+            "thresholds": {a: float(t) for a, t in zip(ASPECTS, pipeline.thresholds)},
+            "threshold_mode": "tuned_per_aspect" if use_tuned_thresholds else "custom_global",
             "model": pipeline.active_model,
         },
         ensure_ascii=False,
@@ -148,10 +156,18 @@ def create_demo():
                     btn_clear = gr.Button("Xóa")
 
             with gr.Column(scale=2):
+                checkpoint_exists = Path("outputs/checkpoints/multitask_seed42.pt").exists()
+                model_choices = ["Baseline TF-IDF"]
+                if checkpoint_exists:
+                    model_choices.insert(0, "PhoBERT MultiTask")
                 model_choice = gr.Radio(
-                    choices=["MultiTask ViSoBERT (Mô hình sâu)", "Baseline TF-IDF"],
-                    value="MultiTask ViSoBERT (Mô hình sâu)",
+                    choices=model_choices,
+                    value="PhoBERT MultiTask" if checkpoint_exists else "Baseline TF-IDF",
                     label="Chọn mô hình:",
+                )
+                use_tuned_thresholds = gr.Checkbox(
+                    value=True,
+                    label="Dùng ngưỡng đã tinh chỉnh riêng cho từng khía cạnh",
                 )
                 threshold_slider = gr.Slider(
                     minimum=0.1,
@@ -159,7 +175,7 @@ def create_demo():
                     value=0.45,
                     step=0.05,
                     label="Ngưỡng phát hiện khía cạnh (Threshold):",
-                    info="Xác suất >= ngưỡng sẽ được xem là có mặt.",
+                    info="Chỉ áp dụng khi bỏ chọn ngưỡng đã tinh chỉnh phía trên.",
                 )
 
         gr.Markdown("### 🎯 Kết quả phân tích trực quan:")
@@ -190,12 +206,12 @@ def create_demo():
 
         btn_submit.click(
             fn=analyze_text,
-            inputs=[input_text, model_choice, threshold_slider],
+            inputs=[input_text, model_choice, use_tuned_thresholds, threshold_slider],
             outputs=[output_html, output_json, output_chart],
         )
         input_text.submit(
             fn=analyze_text,
-            inputs=[input_text, model_choice, threshold_slider],
+            inputs=[input_text, model_choice, use_tuned_thresholds, threshold_slider],
             outputs=[output_html, output_json, output_chart],
         )
         btn_clear.click(lambda: ("", "", "", {}), outputs=[input_text, output_html, output_json, output_chart])

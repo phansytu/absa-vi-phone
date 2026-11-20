@@ -1,16 +1,17 @@
-# So sánh Baseline V2C vs PhoBERT
+# So sánh cuối trên tập Test
 
-*Số seed PhoBERT: 3 (seeds: [42, 123, 456])*
+Hai mô hình được đánh giá trên cùng 2.224 mẫu. Ngưỡng TF-IDF V2C được chọn trên Dev; ngưỡng PhoBERT lấy từ checkpoint đã chọn trên Dev. PhoBERT là một lần huấn luyện với seed 42.
 
-| Model               | Joint F1        | Aspect Micro    | Aspect Macro    | Sentiment (gold)   | Empty Acc       |
-|:--------------------|:----------------|:----------------|:----------------|:-------------------|:----------------|
-| Baseline V2C        | 0.7465          | 0.8646          | 0.8374          | 0.7168             | 0.3333          |
-| PhoBERT (n=3 seeds) | 0.8079 ± 0.0023 | 0.8986 ± 0.0016 | 0.8020 ± 0.0070 | 0.7661 ± 0.0034    | 0.3333 ± 0.0000 |
+| Mô hình | Aspect Micro-F1 | Aspect Macro-F1 | Sentiment Macro-F1 (gold aspect) | Joint Precision | Joint Recall | Joint F1 |
+|:--|--:|--:|--:|--:|--:|--:|
+| TF-IDF V2C | 0.8606 | 0.8344 | 0.7720 | 0.7609 | 0.7254 | 0.7427 |
+| PhoBERT MultiTask, seed 42 | **0.9002** | **0.8672** | **0.8282** | **0.8085** | **0.8197** | **0.8141** |
 
-## Delta (PhoBERT - Baseline)
+## Nhận xét
 
-- **Joint F1**: +0.0615
-- **Aspect Micro**: +0.0340
-- **Aspect Macro**: -0.0354
-- **Sentiment (gold)**: +0.0494
-- **Empty Acc**: 0.0000
+- PhoBERT hơn TF-IDF 0.0713 điểm Joint F1 tuyệt đối.
+- PhoBERT đạt F1 cao hơn ở 9/10 khía cạnh về aspect detection. TF-IDF tốt hơn ở STORAGE (0.7119 so với 0.6250).
+- Với Joint F1 theo khía cạnh, TF-IDF tốt hơn ở STORAGE (0.5424 so với 0.3750). PhoBERT vẫn tốt hơn tổng thể.
+- PhoBERT được huấn luyện một seed; kết quả chưa đo độ dao động giữa các seed.
+
+Nguồn số liệu: `multitask_seed42_test.json`, `baseline_test_v2c.json`. Không dùng Test để chọn ngưỡng hay tinh chỉnh mô hình.

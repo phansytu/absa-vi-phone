@@ -5,7 +5,7 @@
 [![Transformers](https://img.shields.io/badge/Transformers-HuggingFace-yellow.svg)](https://huggingface.co/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-Dự án nghiên cứu và triển khai hệ thống **Aspect-Based Sentiment Analysis (ABSA)** trên tập dữ liệu phản hồi sinh viên về điện thoại thông minh (**UIT-ViSFD** gồm 11.122 câu đánh giá).
+Dự án nghiên cứu và triển khai hệ thống **Aspect-Based Sentiment Analysis (ABSA)** cho phản hồi điện thoại bằng dữ liệu UIT‑ViSFD gồm 11.122 câu. Hệ thống phát hiện 10 khía cạnh và gán Positive, Negative hoặc Neutral cho từng khía cạnh được nhắc tới.
 
 ---
 
@@ -47,7 +47,7 @@ Tiền xử lý (src/data/preprocess.py)
        ├─────────────────────────────────────────┐
        ▼                                         ▼
 Mô hình Đối chứng Baseline             Mô hình Sâu Multi-task
-(TF-IDF + 10 LR Hiện diện + 10 LR Cảm xúc)   (Pre-trained ViSoBERT + Dual Heads)
+(TF-IDF + 10 LR Hiện diện + 10 LR Cảm xúc)   (PhoBERT vinai/phobert-base + 2 đầu ra đa nhiệm)
        │                                         │
        ▼                                         ▼
 Xác suất hiện diện [10] & Cực tính [10]      Xác suất hiện diện [10] & Cực tính [10]
@@ -78,7 +78,6 @@ python -m venv .venv
 
 # Cài đặt toàn bộ thư viện cần thiết
 pip install -r requirements.txt
-pip install protobuf
 ```
 
 *(Khuyến nghị nếu máy có GPU NVIDIA, hãy cài PyTorch hỗ trợ CUDA để tăng tốc huấn luyện mô hình sâu: `pip install torch --index-url https://download.pytorch.org/whl/cu121`)*
@@ -93,6 +92,13 @@ Dữ liệu thô đã được lưu tại `data/raw/` (`Train.csv`, `Dev.csv`, `
 python -m src.data.load data/raw data/processed
 ```
 *Kết quả:* Sinh ra `train.jsonl` (7.786 dòng), `dev.jsonl` (1.112 dòng), `test.jsonl` (2.224 dòng) tại `data/processed/`.
+
+Chuẩn bị dữ liệu đã tách từ cho PhoBERT:
+
+```powershell
+python -m src.data.segment --in-dir data/processed --out-dir data/processed_segmented
+python -m src.data.prepare_final --in-dir data/processed_segmented --out-dir data/processed_final --no-tone
+```
 
 ---
 
@@ -115,13 +121,13 @@ Huấn luyện mô hình baseline trên tập Train, quét ngưỡng tối ưu t
 python -m src.run_baseline data/raw outputs
 ```
 
-*Kết quả đạt được trên tập Dev:*
-- **Aspect Micro-F1:** `0.868`
-- **Aspect Macro-F1:** `0.822`
-- **Sentiment Macro-F1 (given gold):** `0.777`
-- **Joint Aspect–Polarity F1 (End-to-End):** **`0.751`**
-- **Ngưỡng tối ưu:** `0.45`
-- File sinh ra: `outputs/metrics/baseline_dev.json`, `outputs/predictions/baseline_dev.jsonl`.
+Lệnh trên chọn ngưỡng trên Dev và lưu kết quả Dev. Chỉ sau khi chốt cấu hình mới chấm Test:
+
+```powershell
+python -m src.run_baseline data/raw outputs --test
+```
+
+Kết quả Dev V2C hiện được lưu ở `outputs/metrics/baseline_dev_v2c.json`; ngưỡng riêng theo khía cạnh được chọn trên Dev. Kết quả Test đã chấm một lần và được lưu tại `outputs/metrics/baseline_test_v2c.json`.
 
 ---
 
@@ -135,7 +141,7 @@ So sánh 8 cấu hình tiền xử lý để đánh giá sự đóng góp của 
 
 ---
 
-### Bước 6: Huấn luyện Mô hình Sâu Đa nhiệm (Multi-task ViSoBERT)
+### Bước 6: Huấn luyện mô hình đa nhiệm PhoBERT
 
 Huấn luyện mô hình mạng nơ-ron sâu dùng cấu hình `configs/multitask.yaml`:
 
@@ -143,8 +149,8 @@ Huấn luyện mô hình mạng nơ-ron sâu dùng cấu hình `configs/multitas
 # Huấn luyện chính thức Seed 42
 python -m src.train --config configs/multitask.yaml --seed 42
 
-# (Tùy chọn) Chạy tự động 3 seed (42, 43, 44) để tính Mean ± Std theo Quy tắc 7.1.6:
-powershell scripts/run_seeds.ps1      # Trên Linux: bash scripts/run_seeds.sh
+# (Tùy chọn, tốn thời gian) Chạy 3 seed (42, 43, 44):
+powershell -ExecutionPolicy Bypass -File scripts/run_seeds.ps1
 ```
 
 ---
@@ -153,24 +159,9 @@ powershell scripts/run_seeds.ps1      # Trên Linux: bash scripts/run_seeds.sh
 
 #### Cách 1: Giao diện dòng lệnh tương tác trực tiếp (CLI REPL)
 ```powershell
-python -m src.predict
+python -m src.demo --model multitask --detailed
 ```
-Nhập bất kỳ câu đánh giá nào và nhận bảng phân tích tức thì:
-```text
-👉 Nhập câu đánh giá: Pin trâu dùng 2 ngày nhưng màn hình mờ, camera chụp đêm xấu
-
-📝 Câu gốc       : Pin trâu dùng 2 ngày nhưng màn hình mờ, camera chụp đêm xấu
-🔍 Đã chuẩn hóa  : pin trâu dùng 2 ngày nhưng màn hình mờ, camera chụp đêm xấu
-📌 Phát hiện được: 3 khía cạnh
-----------------------------------------------------------------------
-Khía cạnh (Aspect)     | Giải nghĩa         | Cực tính (Sentiment)   | Độ tin cậy
-----------------------------------------------------------------------
-BATTERY                | Pin & Nguồn        | 👍 Positive (Tích cực) | 96.42%
-SCREEN                 | Màn hình           | 👎 Negative (Tiêu cực) | 88.15%
-CAMERA                 | Máy ảnh            | 👎 Negative (Tiêu cực) | 91.20%
-----------------------------------------------------------------------
-```
-
+Nhập câu sau dấu nhắc; gõ `q` để thoát. Câu đầu tiên có thể mất thêm thời gian nạp PhoBERT. Dùng `--model baseline` để chạy TF-IDF. Checkpoint PhoBERT phải tồn tại tại `outputs/checkpoints/multitask_seed42.pt`.
 #### Cách 2: Khởi chạy Giao diện Web (Gradio Web UI)
 ```powershell
 python demo/app.py
@@ -185,7 +176,7 @@ Mở trình duyệt tại **`http://127.0.0.1:7860`** để sử dụng giao di�
 absa-vi-phone/
 ├── configs/                      # Cấu hình siêu tham số thí nghiệm (YAML)
 │   ├── baseline.yaml             # Cấu hình TF-IDF Baseline
-│   └── multitask.yaml            # Cấu hình Multi-task ViSoBERT
+│   └── multitask.yaml            # Cấu hình Multi-task PhoBERT
 ├── data/
 │   ├── download_data.sh          # Script tải dữ liệu UIT-ViSFD từ tác giả
 │   ├── raw/                      # Dữ liệu gốc: Train.csv, Dev.csv, Test.csv (Không commit)
@@ -194,7 +185,6 @@ absa-vi-phone/
 │   └── app.py                    # Ứng dụng Web UI tương tác bằng Gradio
 ├── docs/
 │   ├── HUONG_DAN_NHOM.md         # Sổ tay hướng dẫn chi tiết quy tắc làm việc nhóm
-│   └── SO_TAY_TIEN_XU_LY.md      # Tài liệu phân tích chuyên sâu các luật tiền xử lý
 ├── experiments/
 │   ├── audit_text.py             # Script kiểm kê và đo lường bất thường dữ liệu thô
 │   └── ablation_baseline.py      # Thí nghiệm 5-fold CV khảo sát tác động tiền xử lý
@@ -204,8 +194,13 @@ absa-vi-phone/
 │   └── 03_error_analysis.ipynb   # Phân tích lỗi đa khía cạnh, trái chiều & mẫu rỗng
 ├── outputs/                      # Thư mục lưu kết quả thực nghiệm
 │   ├── checkpoints/              # File trọng số mô hình (.pt)
-│   ├── metrics/                  # Chỉ số đánh giá chi tiết (.json)
-│   └── predictions/              # Dự đoán từng câu trên tập Dev (.jsonl)
+│   ├── metrics/                  # Metrics và bảng/biểu đồ so sánh cuối
+│   ├── predictions/              # Dự đoán Dev/Test theo ID (.jsonl)
+│   ├── analysis_phobert/         # Phân tích lỗi trên Dev
+│   ├── analysis_baseline/        # Phân tích lỗi trên Dev
+│   └── archive/                  # Kết quả thí nghiệm cũ, không dùng báo cáo cuối
+├── report/                       # Báo cáo Markdown và PDF
+├── slides/                       # Slide thuyết trình PowerPoint
 ├── scripts/
 │   ├── checks.py                 # Kiểm tra tính toàn vẹn dữ liệu
 │   ├── export_clean_data.py      # Xuất dữ liệu đã làm sạch sang CSV
@@ -219,10 +214,11 @@ absa-vi-phone/
 │   │   └── schema.py             # Định nghĩa nhãn, parse_label, to/from_vectors
 │   ├── models/
 │   │   ├── baseline.py           # Mô hình TF-IDF + Logistic Regression
-│   │   └── multitask.py          # Mô hình Deep Multi-task ViSoBERT + Loss mask
+│   │   └── multitask.py          # PhoBERT Multi-task + loss mask
 │   ├── evaluate.py               # Bộ metric chuẩn Mục 13 (Aspect, Sentiment, Joint)
 │   ├── pipeline.py               # Lớp ABSAPipeline đóng gói suy luận End-to-End
-│   ├── predict.py                # Giao diện dòng lệnh CLI tương tác
+│   ├── demo.py                   # Giao diện dòng lệnh nhập câu mới
+│   ├── predict.py                # Sinh dự đoán trên split để đánh giá
 │   ├── run_baseline.py           # Runner chạy huấn luyện và đánh giá baseline
 │   ├── train.py                  # Vòng lặp huấn luyện mô hình sâu
 │   └── utils.py                  # Các hàm tiện ích dùng chung (Seed, IO, Timer)
@@ -239,16 +235,35 @@ absa-vi-phone/
 
 ---
 
-## 📊 5. Bảng Kết Quả Thực Nghiệm Trên Tập Dev
+## 📊 5. Kết quả cuối trên tập Test
 
-| Mô hình | Aspect Micro-F1 | Aspect Macro-F1 | Sentiment Macro-F1 | **Joint F1 (End-to-End)** |
+| Mô hình | Aspect Micro-F1 | Aspect Macro-F1 | Sentiment Macro-F1 | **Joint F1** |
 | :--- | :---: | :---: | :---: | :---: |
-| **TF-IDF Baseline** | **0.868** | **0.822** | **0.777** | **0.751** |
-| **Multi-task ViSoBERT** *(Full)* | Đang huấn luyện | Đang huấn luyện | Đang huấn luyện | Mục tiêu $\ge 0.76$ |
+| TF-IDF baseline | 0.8606 | 0.8344 | 0.7720 | 0.7427 |
+| PhoBERT MultiTask, seed 42 | **0.9002** | **0.8672** | **0.8282** | **0.8141** |
+
+Hai mô hình được chấm trên cùng 2.224 câu Test; ngưỡng được chọn trên Dev. PhoBERT đạt Joint F1 cao hơn 0.0713 điểm tuyệt đối. Kết quả PhoBERT hiện có một seed nên chưa đo được độ dao động giữa các lần huấn luyện. `STORAGE` là khía cạnh yếu nhất của PhoBERT theo Joint F1 (0.3750); TF-IDF đạt 0.5424 ở khía cạnh này.
 
 ---
 
 ## 📜 6. Quy Tắc Học Thuật
 - Toàn bộ luật tiền xử lý, từ vựng và ngưỡng chỉ được fit trên tập **Train** và kiểm chứng trên tập **Dev**.
-- Tập **Test** chỉ được chấm **duy nhất 1 lần** vào thời điểm nghiệm thu cuối cùng của đề tài.
+- Chọn checkpoint và ngưỡng trên **Dev**; chỉ chấm **Test** sau khi chốt cấu hình. Không dùng điểm Test để tinh chỉnh.
 - Dự án tuân thủ bản quyền dữ liệu UIT-ViSFD cho mục đích học tập và nghiên cứu học thuật.
+
+## Nguồn dữ liệu và mô hình
+
+- Dữ liệu: [UIT‑ViSFD chính thức](https://github.com/LuongPhan/UIT-ViSFD). Repo không chứa bản sao dữ liệu thô; hãy tải theo điều khoản của tác giả và không phân phối lại khi chưa được phép.
+- Encoder: [PhoBERT của VinAI](https://github.com/VinAIResearch/PhoBERT), checkpoint `vinai/phobert-base`.
+- Công thức đánh giá F1: [scikit‑learn](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html).
+
+Checkpoint `.pt` không được Git theo dõi. Trên bản clone mới, cần chuẩn bị dữ liệu và chạy huấn luyện PhoBERT trước khi chọn `--model multitask`.
+
+## Tái lập và trạng thái bàn giao
+
+- Kết quả cuối hiện có là một lần huấn luyện PhoBERT với seed 42. Tập Test đã được chấm cho cả hai mô hình; không chạy lại Test để thay đổi lựa chọn mô hình/ngưỡng.
+- Chạy kiểm thử bằng `python -m pytest -q tests`.
+- Dự đoán PhoBERT trên Dev: `python -m src.predict --seed 42 --split dev --thresholds ckpt`.
+- Kết quả Test, dự đoán theo mã mẫu, bảng so sánh và biểu đồ nằm trong `outputs/`. Phân tích lỗi chỉ dùng Dev.
+- Checkpoint seed 42 không được commit vì dung lượng lớn; để chạy demo PhoBERT trên bản clone mới, lấy checkpoint từ kênh bàn giao nội bộ hoặc huấn luyện lại. Không phát tán dữ liệu gốc nếu điều khoản bộ dữ liệu không cho phép.
+- Sổ tay nhóm còn một số mục kế hoạch cũ; ghi chú ở cuối sổ tay mô tả trạng thái hiện tại.

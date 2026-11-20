@@ -1,6 +1,6 @@
 """Pipeline xử lý từ đầu đến cuối (End-to-End ABSA Pipeline) cho tiếng Việt.
 
-Nhận văn bản thô -> Tiền xử lý -> Mô hình (MultiTask ViSoBERT hoặc Baseline) ->
+Nhận văn bản thô -> Tiền xử lý -> Mô hình (PhoBERT Multi-task hoặc Baseline) ->
 Áp dụng ngưỡng -> Trả về danh sách các cặp {aspect, sentiment} cho các khía cạnh có mặt.
 """
 
@@ -14,6 +14,7 @@ import torch
 from transformers import AutoTokenizer
 
 from src.data.preprocess import normalize
+from src.data.segment import segment_text
 from src.data.schema import ASPECTS, POLARITES
 from src.models.multitask import MultiTaskABSA
 
@@ -83,6 +84,8 @@ class ABSAPipeline:
             self.thresholds = np.asarray(ckpt["thresholds"], dtype=float)
         else:
             self.thresholds = np.full(len(ASPECTS), 0.5)
+        if self.thresholds.shape != (len(ASPECTS),):
+            raise ValueError(f"Checkpoint cần {len(ASPECTS)} ngưỡng, nhận {self.thresholds.shape}")
 
     def _load_model(self):
         use_multitask = False
@@ -98,6 +101,7 @@ class ABSAPipeline:
         else:
             self._load_baseline_model()
             self.active_model = "baseline"
+        self.tuned_thresholds = self.thresholds.copy()
 
     def _load_multitask_model(self):
         # Nạp checkpoint PyTorch an toàn
@@ -107,7 +111,7 @@ class ABSAPipeline:
             ckpt = torch.load(self.checkpoint_path, map_location=self.device)
 
         self.cfg = ckpt.get("cfg", {})
-        encoder_name = self.cfg.get("encoder", "uitnlp/visobert")
+        encoder_name = self.cfg.get("encoder", "vinai/phobert-base")
         pooling = self.cfg.get("pooling", "mean")
         self.norm_kwargs = self.cfg.get("norm", self.norm_kwargs)
 
@@ -120,6 +124,8 @@ class ABSAPipeline:
         self._init_thresholds(ckpt)
 
     def _load_baseline_model(self):
+        import json
+
         from src.data.load import load_split
         from src.models.baseline import TfidfBaseline
 
@@ -130,16 +136,33 @@ class ABSAPipeline:
         train_data = load_split(self.raw_data_dir, "train")
         self.model = TfidfBaseline().fit(train_data)
         if self.user_threshold is not None:
-            th = float(self.user_threshold) if isinstance(self.user_threshold, (int, float)) else self.user_threshold[0]
-            self.thresholds = np.full(len(ASPECTS), th)
+            if isinstance(self.user_threshold, (int, float)):
+                self.thresholds = np.full(len(ASPECTS), float(self.user_threshold))
+            else:
+                thresholds = np.asarray(self.user_threshold, dtype=float)
+                if thresholds.shape != (len(ASPECTS),):
+                    raise ValueError(f"Cần {len(ASPECTS)} ngưỡng, nhận {thresholds.shape}")
+                self.thresholds = thresholds
         else:
-            self.thresholds = np.full(len(ASPECTS), 0.45)
+            # Ngưỡng V2C được chọn trên Dev; dùng đúng thứ tự ASPECTS.
+            threshold_file = Path("outputs/metrics/baseline_dev_v2c.json")
+            if threshold_file.exists():
+                with threshold_file.open(encoding="utf-8") as f:
+                    saved = json.load(f).get("thresholds")
+                values = np.asarray(saved, dtype=float) if saved is not None else np.array([])
+                self.thresholds = values if values.shape == (len(ASPECTS),) else np.full(len(ASPECTS), 0.45)
+            else:
+                self.thresholds = np.full(len(ASPECTS), 0.45)
 
     def preprocess_text(self, text: str) -> str:
         """Chuẩn hóa văn bản bằng hàm normalize dùng chung của dự án."""
         if not text or not str(text).strip():
             return ""
-        return normalize(str(text), **self.norm_kwargs)
+        text = str(text)
+        # PhoBERT được huấn luyện bằng text_segmented rồi mới normalize.
+        if self.active_model == "multitask" and self.cfg.get("use_segmented", False):
+            text = segment_text(text)
+        return normalize(text, **self.norm_kwargs)
 
     def predict(
         self,
@@ -172,7 +195,8 @@ class ABSAPipeline:
         if self.active_model == "multitask":
             prob_matrix, sent_matrix, sent_prob_matrix = self._infer_multitask(normalized_texts)
         else:
-            prob_matrix, sent_matrix, sent_prob_matrix = self._infer_baseline(normalized_texts)
+            # Baseline tự normalize và đánh dấu phủ định như lúc fit.
+            prob_matrix, sent_matrix, sent_prob_matrix = self._infer_baseline([str(t) for t in text_list])
 
         # 3. Tổng hợp kết quả theo từng câu
         results = []

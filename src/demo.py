@@ -2,18 +2,18 @@
 
 Cách dùng:
 1. Dự đoán 1 câu trực tiếp:
-   python -m src.predict --text "Pin trâu nhưng màn hình hơi ám vàng, chụp ảnh đẹp"
+   python -m src.demo --text "Pin trâu nhưng màn hình hơi ám vàng, chụp ảnh đẹp"
 
 2. Chế độ tương tác liên tục (gõ và xem kết quả trực tiếp):
-   python -m src.predict --interactive
-   (hoặc chỉ cần chạy: python -m src.predict)
+   python -m src.demo --interactive
+   (hoặc chỉ cần chạy: python -m src.demo)
 
 3. Dự đoán theo file văn bản (mỗi dòng một câu):
-   python -m src.predict --file inputs.txt --output results.json
+   python -m src.demo --file inputs.txt --output results.json
 
 4. Lựa chọn mô hình:
-   python -m src.predict --model multitask --checkpoint outputs/checkpoints/multitask_seed42.pt
-   python -m src.predict --model baseline
+   python -m src.demo --model multitask --checkpoint outputs/checkpoints/multitask_seed42.pt
+   python -m src.demo --model baseline
 """
 
 from __future__ import annotations

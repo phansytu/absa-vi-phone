@@ -85,7 +85,7 @@ Thời gian: vài giây (tùy mạng). Script **dừng ngay** nếu số mẫu k
 python -m pytest -q tests
 ```
 
-Kết quả mong đợi: `9 passed`. Chưa pass thì **đừng làm tiếp**, vì các bước sau phụ thuộc vào `normalize()`.
+Kết quả hiện tại: `25 passed` (có thể thay đổi khi nhóm thêm test). Nếu test lỗi thì sửa trước khi dùng pipeline.
 
 ### Bước 3. Kiểm kê dữ liệu thô (tùy chọn nhưng nên làm)
 
@@ -371,17 +371,18 @@ Aspect micro-F1 (chỉ xét có mặt hay không): phát hiện đúng BATTERY v
 
 ---
 
-## 8. Việc chưa có trong repo và người phụ trách
+## 8. Thành phần hiện có trong repo
 
-| File dự kiến                                                                       | Nội dung                                                                    | Phụ trách (theo phân công 5 người) |
+| File / thành phần                                                                       | Nội dung                                                                    | Trạng thái |
 | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- | ---------------------------------------- |
-| `src/data/dataset.py`                                                              | Dataset PyTorch, tokenize, collate, nhãn −100                              | TV1                                      |
-| `src/models/multitask.py`, `src/train.py`, `configs/multitask.yaml`            | Encoder đa nhiệm, huấn luyện, 3 seed                                     | TV3, TV4                                 |
-| `tests/test_schema.py`, `tests/test_evaluate.py`                                 | Test schema và metric bằng ví dụ tính tay (mục 6.4 dùng được ngay) | TV1, TV2                                 |
-| `src/pipeline.py`, `tests/test_pipeline.py`, `demo/app.py`                     | Text → `[{aspect, sentiment}]`, test trường hợp biên, demo Gradio     | TV5                                      |
-| `notebooks/01_eda.ipynb`, `02_baseline_check.ipynb`, `03_error_analysis.ipynb` | Khảo sát dữ liệu, kiểm tra tay, phân tích lỗi                        | TV1, TV2, TV5                            |
-| `README.md` (gốc), `CONTRIBUTIONS.md`                                           | Hướng dẫn chạy lại, nhật ký đóng góp và khảo sát                | TV4                                      |
-| `.github/workflows/ci.yml`                                                         | CI nhẹ: pytest + ruff                                                       | TV4                                      |
+| `src/data/dataset.py`, `src/data/schema.py`, `src/data/load.py` | Dataset, schema nhãn, đọc CSV và chuyển JSONL | Có; kiểm thử hiện tại đạt |
+| `src/models/baseline.py`, `src/models/multitask.py`, `src/train.py` | TF-IDF baseline và PhoBERT Multi-task | Có; PhoBERT seed 42 đã huấn luyện |
+| `src/evaluate.py`, `src/predict.py`, `src/evaluate_predictions.py` | Metrics, lưu dự đoán và đánh giá theo ID | Có; đã có metrics Dev/Test |
+| `src/pipeline.py`, `src/demo.py`, `demo/app.py` | Pipeline, CLI nhập câu và giao diện Gradio | Có; checkpoint cục bộ cần để chạy PhoBERT |
+| `tests/` | Kiểm tra schema, tiền xử lý, metric, loss mask và pipeline | Có; 25 passed ở lần kiểm tra 20/11/2026 |
+| `notebooks/`, `experiments/`, `scripts/` | EDA, ablation, audit và script hỗ trợ | Có; không phải mọi thí nghiệm đều đã chạy cho kết quả cuối |
+| `README.md`, `CONTRIBUTIONS.md`, `report/`, `slides/` | Hướng dẫn, phân công, báo cáo và slide | Có; cần xác nhận tên/đóng góp nhóm |
+| `.github/workflows/ci.yml` | CI nhẹ: pytest + ruff | Có |
 
 ---
 
@@ -405,7 +406,7 @@ Aspect micro-F1 (chỉ xét có mặt hay không): phát hiện đúng BATTERY v
 
 - [ ] Cài môi trường, `pip install -r requirements.txt`.
 - [ ] `bash data/download_data.sh`, so SHA256 với nhóm.
-- [ ] `python -m pytest -q tests` → 9 passed.
+- [ ] `python -m pytest -q tests` → 25 passed (lần kiểm tra 20/11/2026; có thể đổi theo code mới).
 - [ ] `python -m src.run_baseline` → joint F1 Dev khoảng 0,75.
 - [ ] Chạy đoạn code ở mục 3 (bước 6) với một câu của chính bạn.
 - [ ] Đọc `src/data/schema.py` và giải thích được vì sao có `−100`.
@@ -415,7 +416,9 @@ Aspect micro-F1 (chỉ xét có mặt hay không): phát hiện đúng BATTERY v
 
 ---
 
-## 11. Giới hạn của kết quả hiện có (cần nói thật khi báo cáo)
+## 11. Giới hạn của kết quả tại thời điểm soạn sổ tay
+
+> Các dòng dưới đây là ghi chú lịch sử, trước khi kết quả cuối seed 42 được tạo. Xem mục 12 để biết trạng thái mới.
 
 - Các số liệu trên là kết quả của **một cấu hình baseline xác định** trên **Train (CV)** và **Dev**. Chúng chưa phải kết quả cuối của đề tài; số chính thức chỉ lấy trên Test, một lần, sau khi chốt cấu hình.
 - Cấu hình baseline được chọn sau khi thử nhiều biến thể trên cùng một bộ CV, nên con số CV hơi lạc quan.
@@ -423,4 +426,17 @@ Aspect micro-F1 (chỉ xét có mặt hay không): phát hiện đúng BATTERY v
 - Các khía cạnh ít mẫu (`STORAGE`: khoảng 91 mẫu Train, 14 mẫu Dev) cho số đo không ổn định; luôn báo kèm số mẫu.
 - Lớp vắng mặt vẫn là điểm yếu: baseline chỉ nhận ra khoảng 17–28% mẫu không có khía cạnh nào (tùy ngưỡng; chỉ 18 mẫu Dev nên rất bất định).
 - Chưa kiểm tra **gần-trùng** giữa Train/Dev/Test (mới kiểm tra khớp tuyệt đối: 0 câu trùng). Đây là việc cần làm ở tuần 2–3.
-- Hành vi của tokenizer (PhoBERT, ViSoBERT) với văn bản đã chuẩn hóa **chưa được đo**; cần làm ở tuần 4.
+- Hành vi tokenizer ViSoBERT chưa thuộc triển khai hiện tại; encoder được dùng là PhoBERT.
+
+## 12. Ghi chú cập nhật trạng thái dự án NLP-34 (20/11/2026)
+
+> Mục này cập nhật các kế hoạch và trạng thái lịch sử ở trên bằng bằng chứng từ lần chạy hiện tại. Khi có mâu thuẫn, dùng trạng thái ở mục 12 và báo cáo trong `report/`.
+
+- Đã có pipeline baseline TF-IDF và PhoBERT Multi-task, CLI/web demo, bộ kiểm thử, checkpoint seed 42 cục bộ, dự đoán/metrics theo ID, bảng so sánh và phân tích lỗi trên Dev.
+- PhoBERT seed 42 chọn epoch 7; trên Test 2.224 câu: aspect micro-F1 0,9002; aspect macro-F1 0,8672; sentiment macro-F1 trên khía cạnh gold 0,8282; joint F1 0,8141. TF-IDF V2C joint F1 0,7427.
+- Kết quả seed 42 này là một lần chạy. Script ba seed có sẵn nhưng chưa được chạy cho kết quả hiện tại; không được ghi mean ± std từ các file cũ như thể chúng thuộc cùng lần chạy.
+- Tập Test đã được dùng cho so sánh cuối. Không tinh chỉnh ngưỡng/mô hình dựa trên Test và không cần chấm lại khi chỉ sửa tài liệu/demo.
+- Phân tích lỗi nên dựa vào dự đoán Dev mới nhất. STORAGE ít mẫu và mẫu rỗng là nhóm yếu; cần ghi số mẫu khi diễn giải.
+- Chưa xác nhận tên thật và đóng góp từng thành viên. Thay mã TV1–TV5 trong `CONTRIBUTIONS.md` bằng thông tin đã được nhóm xác nhận trước khi nộp.
+- Checkpoint PhoBERT (khoảng 540 MB) và dữ liệu gốc không được commit mặc định; bàn giao checkpoint và dữ liệu theo quy định môn học/điều khoản dữ liệu.
+- Ghi chú này không thay thế yêu cầu kiểm tra near-duplicate hoặc kiểm toán tokenizer nếu nhóm còn thời gian; báo rõ việc nào chưa làm trong báo cáo.

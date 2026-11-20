@@ -1,30 +1,136 @@
 {
  "cfg": {
-  "encoder": "uitnlp/visobert",
+  "encoder": "vinai/phobert-base",
   "max_length": 128,
   "pooling": "mean",
-  "batch_size": 32,
-  "epochs": 6,
-  "lr_encoder": 2e-05,
-  "lr_head": 0.0005,
-  "lambda": 1.0,
+  "dropout": 0.1,
+  "use_segmented": true,
   "norm": {
-   "tone": true,
+   "tone": false,
    "teencode": true,
    "repeat": true
-  }
+  },
+  "data_dir": "data/processed_final",
+  "batch_size": 32,
+  "epochs": 8,
+  "lr_encoder": 2e-05,
+  "lr_head": 0.0005,
+  "weight_decay": 0.01,
+  "warmup_ratio": 0.1,
+  "lambda": 1.0,
+  "pos_weight_power": 0.5,
+  "pos_weight_max": 20.0,
+  "sent_weight_power": 0.0,
+  "oversample": {},
+  "select_metric": "macro_joint",
+  "patience": 3,
+  "monitor_aspects": [
+   "STORAGE"
+  ]
  },
+ "best_epoch": 7,
+ "select_metric": "macro_joint",
+ "best_score": 0.8589193511555284,
  "dev": {
   "n_samples": 1112.0,
-  "aspect_micro_f1": 0.8439024390243902,
-  "aspect_macro_f1": 0.7545890451689807,
+  "aspect_micro_f1": 0.9100671140939597,
+  "aspect_macro_f1": 0.8951690527957699,
   "n_gold_present_pairs": 3316.0,
-  "sentiment_macro_f1_given_gold_aspect": 0.7552664587746104,
-  "joint_precision": 0.7318125770653514,
-  "joint_recall": 0.7159227985524729,
-  "joint_f1": 0.723780487804878,
+  "sentiment_macro_f1_given_gold_aspect": 0.8182527533291949,
+  "joint_precision": 0.8138093832989083,
+  "joint_recall": 0.8317249698431846,
+  "joint_f1": 0.8226696495152871,
   "n_gold_empty": 18.0,
-  "gold_empty_predicted_empty_rate": 0.2222222222222222
+  "gold_empty_predicted_empty_rate": 0.16666666666666666
  },
- "epoch": 1
+ "aspect_f1": {
+  "SCREEN": 0.8288973384030418,
+  "CAMERA": 0.9506578947368421,
+  "FEATURES": 0.9151193633952255,
+  "BATTERY": 0.9744597249508841,
+  "PERFORMANCE": 0.9026845637583892,
+  "STORAGE": 0.8333333333333334,
+  "DESIGN": 0.8787061994609164,
+  "PRICE": 0.9295238095238095,
+  "GENERAL": 0.893090909090909,
+  "SER&ACC": 0.8452173913043478
+ },
+ "thresholds": {
+  "SCREEN": 0.5000000000000001,
+  "CAMERA": 0.6000000000000002,
+  "FEATURES": 0.7000000000000002,
+  "BATTERY": 0.6000000000000002,
+  "PERFORMANCE": 0.45000000000000007,
+  "STORAGE": 0.9000000000000002,
+  "DESIGN": 0.6000000000000002,
+  "PRICE": 0.6500000000000001,
+  "GENERAL": 0.5500000000000002,
+  "SER&ACC": 0.45000000000000007
+ },
+ "history": [
+  {
+   "epoch": 0,
+   "loss_p": 0.6292669577676742,
+   "loss_s": 0.6825351402407787,
+   "score": 0.6907206770855616,
+   "joint_f1": 0.665521191294387,
+   "aspect_macro_f1": 0.7159201628767361
+  },
+  {
+   "epoch": 1,
+   "loss_p": 0.34732881139536376,
+   "loss_s": 0.4315321250040023,
+   "score": 0.8046794554981169,
+   "joint_f1": 0.754450492864499,
+   "aspect_macro_f1": 0.8549084181317349
+  },
+  {
+   "epoch": 2,
+   "loss_p": 0.25227448197661856,
+   "loss_s": 0.3476298597992444,
+   "score": 0.8328134676752812,
+   "joint_f1": 0.78849506101104,
+   "aspect_macro_f1": 0.8771318743395223
+  },
+  {
+   "epoch": 3,
+   "loss_p": 0.21190982568459432,
+   "loss_s": 0.2804953465696241,
+   "score": 0.8490290017009593,
+   "joint_f1": 0.8057362507392076,
+   "aspect_macro_f1": 0.892321752662711
+  },
+  {
+   "epoch": 4,
+   "loss_p": 0.18473157726350378,
+   "loss_s": 0.23885381417196305,
+   "score": 0.853201045787171,
+   "joint_f1": 0.815,
+   "aspect_macro_f1": 0.8914020915743421
+  },
+  {
+   "epoch": 5,
+   "loss_p": 0.16585568912693713,
+   "loss_s": 0.20854382436783586,
+   "score": 0.8564421181272841,
+   "joint_f1": 0.8184642698624057,
+   "aspect_macro_f1": 0.8944199663921625
+  },
+  {
+   "epoch": 6,
+   "loss_p": 0.15281850783551326,
+   "loss_s": 0.18743244546358703,
+   "score": 0.8581572572323435,
+   "joint_f1": 0.8209464471146715,
+   "aspect_macro_f1": 0.8953680673500154
+  },
+  {
+   "epoch": 7,
+   "loss_p": 0.14675102859246927,
+   "loss_s": 0.1727934040007044,
+   "score": 0.8589193511555284,
+   "joint_f1": 0.8226696495152871,
+   "aspect_macro_f1": 0.8951690527957699
+  }
+ ]
 }

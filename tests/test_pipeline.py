@@ -69,8 +69,20 @@ def test_pipeline_batch_prediction(pipeline):
 
 def test_pipeline_threshold_override(pipeline):
     text = "Pin dùng tạm ổn, loa ngoài hơi nhỏ"
-    # Với ngưỡng cực cao (0.99), hầu như không khía cạnh nào vượt qua
-    pipeline.thresholds = [0.99] * len(ASPECTS)
-    res_high = pipeline.predict(text)
-    assert len(res_high) == 0
+    original_thresholds = pipeline.thresholds.copy()
+    try:
+        pipeline.thresholds = [0.99] * len(ASPECTS)
+        res_high = pipeline.predict(text)
+        high_pairs = {(item["aspect"], item["sentiment"]) for item in res_high}
+
+        pipeline.thresholds = [0.0] * len(ASPECTS)
+        res_low = pipeline.predict(text)
+        low_pairs = {(item["aspect"], item["sentiment"]) for item in res_low}
+
+        # Threshold chỉ điều khiển presence: tăng ngưỡng không thể thêm aspect.
+        assert high_pairs.issubset(low_pairs)
+        assert len(res_high) <= len(res_low)
+        assert len(res_low) == len(ASPECTS)
+    finally:
+        pipeline.thresholds = original_thresholds
 
