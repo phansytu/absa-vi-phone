@@ -1,4 +1,4 @@
-"""Huan luyen PhoBERT / ViSoBERT multitask ABSA.
+"""Huan luyen PhoBERT multitask ABSA.
 
     python -m src.train --config configs/multitask.yaml --seed 42 --tag run1
     python -m src.train --config configs/multitask.yaml --tag abl --set pos_weight_power=0 "oversample={STORAGE: 4}"

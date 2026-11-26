@@ -47,7 +47,7 @@ Tiền xử lý (src/data/preprocess.py)
        ├─────────────────────────────────────────┐
        ▼                                         ▼
 Mô hình Đối chứng Baseline             Mô hình Sâu Multi-task
-(TF-IDF + 10 LR Hiện diện + 10 LR Cảm xúc)   (Pre-trained ViSoBERT + Dual Heads)
+(TF-IDF + 10 LR Hiện diện + 10 LR Cảm xúc)   (Pre-trained PhoBERT + Dual Heads)
        │                                         │
        ▼                                         ▼
 Xác suất hiện diện [10] & Cực tính [10]      Xác suất hiện diện [10] & Cực tính [10]
@@ -135,7 +135,7 @@ So sánh 8 cấu hình tiền xử lý để đánh giá sự đóng góp của 
 
 ---
 
-### Bước 6: Huấn luyện Mô hình Sâu Đa nhiệm (Multi-task ViSoBERT)
+### Bước 6: Huấn luyện Mô hình Sâu Đa nhiệm (Multi-task PhoBERT)
 
 Huấn luyện mô hình mạng nơ-ron sâu dùng cấu hình `configs/multitask.yaml`:
 
@@ -185,7 +185,7 @@ Mở trình duyệt tại **`http://127.0.0.1:7860`** để sử dụng giao di�
 absa-vi-phone/
 ├── configs/                      # Cấu hình siêu tham số thí nghiệm (YAML)
 │   ├── baseline.yaml             # Cấu hình TF-IDF Baseline
-│   └── multitask.yaml            # Cấu hình Multi-task ViSoBERT
+│   └── multitask.yaml            # Cấu hình Multi-task PhoBERT
 ├── data/
 │   ├── download_data.sh          # Script tải dữ liệu UIT-ViSFD từ tác giả
 │   ├── raw/                      # Dữ liệu gốc: Train.csv, Dev.csv, Test.csv (Không commit)
@@ -219,7 +219,7 @@ absa-vi-phone/
 │   │   └── schema.py             # Định nghĩa nhãn, parse_label, to/from_vectors
 │   ├── models/
 │   │   ├── baseline.py           # Mô hình TF-IDF + Logistic Regression
-│   │   └── multitask.py          # Mô hình Deep Multi-task ViSoBERT + Loss mask
+│   │   └── multitask.py          # Mô hình Deep Multi-task PhoBERT + Loss mask
 │   ├── evaluate.py               # Bộ metric chuẩn Mục 13 (Aspect, Sentiment, Joint)
 │   ├── pipeline.py               # Lớp ABSAPipeline đóng gói suy luận End-to-End
 │   ├── predict.py                # Giao diện dòng lệnh CLI tương tác
@@ -243,8 +243,8 @@ absa-vi-phone/
 
 | Mô hình | Aspect Micro-F1 | Aspect Macro-F1 | Sentiment Macro-F1 | **Joint F1 (End-to-End)** |
 | :--- | :---: | :---: | :---: | :---: |
-| **TF-IDF Baseline** | **0.868** | **0.822** | **0.777** | **0.751** |
-| **Multi-task ViSoBERT** *(Full)* | Đang huấn luyện | Đang huấn luyện | Đang huấn luyện | Mục tiêu $\ge 0.76$ |
+| **TF-IDF Baseline** | **0.865** | **0.837** | **0.717** | **0.747** |
+| **Multi-task PhoBERT** *(n=3 seeds)* | **0.899 ± 0.002** | **0.802 ± 0.007** | **0.766 ± 0.003** | **0.808 ± 0.002** |
 
 ---
 
