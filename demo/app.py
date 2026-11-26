@@ -149,8 +149,8 @@ def create_demo():
 
             with gr.Column(scale=2):
                 model_choice = gr.Radio(
-                    choices=["MultiTask ViSoBERT (Mô hình sâu)", "Baseline TF-IDF"],
-                    value="MultiTask ViSoBERT (Mô hình sâu)",
+                    choices=["MultiTask PhoBERT (Mô hình sâu)", "Baseline TF-IDF"],
+                    value="MultiTask PhoBERT (Mô hình sâu)",
                     label="Chọn mô hình:",
                 )
                 threshold_slider = gr.Slider(

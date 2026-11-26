@@ -1,6 +1,6 @@
 """Pipeline xử lý từ đầu đến cuối (End-to-End ABSA Pipeline) cho tiếng Việt.
 
-Nhận văn bản thô -> Tiền xử lý -> Mô hình (MultiTask ViSoBERT hoặc Baseline) ->
+Nhận văn bản thô -> Tiền xử lý -> Mô hình (MultiTask PhoBERT hoặc Baseline) ->
 Áp dụng ngưỡng -> Trả về danh sách các cặp {aspect, sentiment} cho các khía cạnh có mặt.
 """
 
@@ -70,6 +70,7 @@ class ABSAPipeline:
         self.cfg: Dict[str, Any] = {}
         self.thresholds: np.ndarray = np.full(len(ASPECTS), 0.45)
         self.norm_kwargs: Dict[str, Any] = {"tone": True, "teencode": True, "repeat": True}
+        self.use_segmented: bool = False
 
         self._load_model()
 
@@ -107,9 +108,10 @@ class ABSAPipeline:
             ckpt = torch.load(self.checkpoint_path, map_location=self.device)
 
         self.cfg = ckpt.get("cfg", {})
-        encoder_name = self.cfg.get("encoder", "uitnlp/visobert")
+        encoder_name = self.cfg.get("encoder", "vinai/phobert-base")
         pooling = self.cfg.get("pooling", "mean")
         self.norm_kwargs = self.cfg.get("norm", self.norm_kwargs)
+        self.use_segmented = bool(self.cfg.get("use_segmented", "phobert" in str(encoder_name).lower()))
 
         self.tokenizer = AutoTokenizer.from_pretrained(encoder_name)
         model = MultiTaskABSA(encoder_name, pooling=pooling)
@@ -123,6 +125,7 @@ class ABSAPipeline:
         from src.data.load import load_split
         from src.models.baseline import TfidfBaseline
 
+        self.use_segmented = False
         if not (self.raw_data_dir / "Train.csv").exists():
             raise FileNotFoundError(
                 f"Không tìm thấy {self.raw_data_dir / 'Train.csv'} để huấn luyện baseline!"
@@ -136,9 +139,14 @@ class ABSAPipeline:
             self.thresholds = np.full(len(ASPECTS), 0.45)
 
     def preprocess_text(self, text: str) -> str:
-        """Chuẩn hóa văn bản bằng hàm normalize dùng chung của dự án."""
+        """Chuẩn hóa văn bản bằng hàm normalize dùng chung của dự án.
+        Nếu mô hình yêu cầu tách từ (ví dụ PhoBERT), tiến hành tách từ trước khi chuẩn hóa.
+        """
         if not text or not str(text).strip():
             return ""
+        if getattr(self, "use_segmented", False):
+            from src.data.segment import segment_text
+            text = segment_text(text)
         return normalize(str(text), **self.norm_kwargs)
 
     def predict(

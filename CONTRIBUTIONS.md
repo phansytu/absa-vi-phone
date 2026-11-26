@@ -50,7 +50,7 @@
 
 ### Thành viên 3 (TV3): Multi-Task Deep Learning Model
 - [x] **Kiến trúc mô hình Multi-task (`src/models/multitask.py`):**
-  - Xây dựng lớp `MultiTaskABSA` sử dụng encoder tiền huấn luyện `uitnlp/visobert`.
+  - Xây dựng lớp `MultiTaskABSA` sử dụng encoder tiền huấn luyện `vinai/phobert-base`.
   - Thiết kế 2 đầu ra (Dual Task Heads): 1 đầu ra nhị phân phát hiện hiện diện khía cạnh (`Linear(H, 10)`), 1 đầu ra đa lớp phân loại cảm xúc (`Linear(H, 30)`).
   - Cơ chế pooling (`mean` / `cls`).
 - [x] **Hàm Loss Masking (`multitask_loss`):**
@@ -80,7 +80,7 @@
 
 ### Thành viên 5 (TV5): End-to-End Pipeline, CLI & Web Application
 - [x] **End-to-End Pipeline (`src/pipeline.py`):**
-  - Xây dựng lớp `ABSAPipeline` đóng gói trọn vẹn luồng suy luận: Tiền xử lý -> Mô hình (ViSoBERT / Baseline) -> Áp dụng ngưỡng -> Xuất kết quả.
+  - Xây dựng lớp `ABSAPipeline` đóng gói trọn vẹn luồng suy luận: Tiền xử lý -> Mô hình (PhoBERT / Baseline) -> Áp dụng ngưỡng -> Xuất kết quả.
   - Tích hợp giải nghĩa tiếng Việt và biểu tượng trực quan cho 10 khía cạnh và 3 cực tính.
 - [x] **Giao diện dòng lệnh CLI (`src/predict.py`):**
   - Hỗ trợ chế độ dự đoán 1 câu trực tiếp (`--text`).
@@ -103,6 +103,6 @@
 | **PR #1** | TV1 & TV4 | Khởi tạo cấu trúc dự án, schema nhãn, script tải dữ liệu thô và unit test tiền xử lý | 18/10/2026 |
 | **PR #2** | TV4 | Bổ sung text audit, ablation script và sửa lỗi bảo mật path traversal | 19/10/2026 |
 | **PR #3** | TV2 & TV4 | Triển khai mô hình Baseline TF-IDF, bộ metric chuẩn Mục 13 và runner dev | 19/10/2026 |
-| **PR #4** | TV1 & TV3 | Tích hợp kiến trúc Multi-task ViSoBERT, PyTorch Dataset, hàm loss mask và vòng lặp huấn luyện | 24/10/2026 |
+| **PR #4** | TV1 & TV3 | Tích hợp kiến trúc Multi-task PhoBERT, PyTorch Dataset, hàm loss mask và vòng lặp huấn luyện | 24/10/2026 |
 | **Feature TV5** | TV5 | Hoàn thiện End-to-End Pipeline, CLI tương tác trực tiếp, Gradio Web UI và bộ Unit test kiểm thử | 02/11/2026 |
 | **Finalization** | Cả nhóm | Hoàn thiện toàn bộ hệ thống configs, utility, notebook EDA & Error Analysis, tài liệu kỹ thuật | 07/11/2026 |

@@ -27,7 +27,7 @@
             "justMyCode": true
         },
         {
-            "name": "🚀 4. Huấn luyện MultiTask ViSoBERT",
+            "name": "🚀 4. Huấn luyện MultiTask PhoBERT",
             "type": "debugpy",
             "request": "launch",
             "module": "src.train",

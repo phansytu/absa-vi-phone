@@ -423,4 +423,4 @@ Aspect micro-F1 (chỉ xét có mặt hay không): phát hiện đúng BATTERY v
 - Các khía cạnh ít mẫu (`STORAGE`: khoảng 91 mẫu Train, 14 mẫu Dev) cho số đo không ổn định; luôn báo kèm số mẫu.
 - Lớp vắng mặt vẫn là điểm yếu: baseline chỉ nhận ra khoảng 17–28% mẫu không có khía cạnh nào (tùy ngưỡng; chỉ 18 mẫu Dev nên rất bất định).
 - Chưa kiểm tra **gần-trùng** giữa Train/Dev/Test (mới kiểm tra khớp tuyệt đối: 0 câu trùng). Đây là việc cần làm ở tuần 2–3.
-- Hành vi của tokenizer (PhoBERT, ViSoBERT) với văn bản đã chuẩn hóa **chưa được đo**; cần làm ở tuần 4.
+- Hành vi của tokenizer (PhoBERT) với văn bản đã chuẩn hóa: đã xử lý đồng bộ qua pyvi segmentation (`use_segmented: true`).
